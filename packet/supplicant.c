@@ -429,11 +429,11 @@ int ruijie_stop_auth()
 /*
  * raw GBK message, return message length
  */
-int ruijie_get_server_msg( char * raw_encode_message_out,int * length)
+int ruijie_get_server_msg( char * raw_encode_message_out,int length)
 {
   size_t len = ntohs(*((u_int16_t*) (ruijie_recv + 0x10))) - 10;
 
-  if (*length < len)
+  if (length < len)
     // space allocation of buffer exceeded
     return -1;
 
