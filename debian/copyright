@@ -1,0 +1,26 @@
+This package was debianized by G.S.Alex <sthots@gmail.com> on
+Sat, 13 Jun 2009 13:45:47 +0800.
+
+It was downloaded from http://ruijieclient.googlecode.com
+
+Upstream Author(s):
+
+	Gong Han  		<gong AT fedoraproject.org> from CSE@FJNU CN
+
+	Chen Tingjun 	<chentingjun AT gmail.com> from POET@FJNU CN
+
+	Microcai		<microcai AT sina.com , microcaicai AT gmail.com>  from ZSTU
+
+	G.S.Alex		<sthots AT Gmail.com> from HIT at Weihai
+
+Copyright:
+
+    <Copyright (C) 2009 Gong Han, Chen Tingjun,  microcai, G.S.Alex >
+    <and others>
+
+License:
+
+The software is licensed under the LGPL, see `/usr/share/common-licenses/LGPL'.
+The Debian packaging is copyright 2009, G.S.Alex <sthots AT gmail.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+

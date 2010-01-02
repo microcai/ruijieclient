@@ -1,0 +1,26 @@
+version 0.7.9
+  FIXED: re-connect after a fixed time
+  NEW: add support for non-versioned libpcap.so  
+           
+
+version 0.7.0
+- NEW: add support for non-xml configuration
+- NEW: add support for ICMP to detect the interruption of network.
+- NEW: auto reconnect when interruption of network is detected.
+- NEW: support for 3 different DHCP modes
+- NEW: daemonise has been added as the default choice
+- CHG: new struct for sending/recving packets
+- DEL: libnet dependency 
+
+version 0.1.1
+- NEW: add support for DHCP
+- CHG: exert XML to manage configuration and it can be generated automatically
+- DEL: fake MAC (useless)
+version 0.1
+- NEW: recieve messages from server
+- NEW: fake version
+- NEW: fake IP
+- NEW: fake MAC
+- CHG: coding style
+- CHG: openssl
+- CHG: debug mode

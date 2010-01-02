@@ -1,0 +1,14 @@
+Source: ruijieclient
+Section: net
+Priority: optional
+Maintainer: Alex Yang <sthots@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev ,libxml2-dev ,libpcap-dev
+Standards-Version: 3.8.0
+Homepage: http://ruijieclient.googlecode.com
+
+Package: ruijieclient
+Architecture: any
+Depends: libpcap0.8 (>= 0.8),libxml2 (>= 2.0) 
+Suggests: gruijieclient
+Description: A powerful ruijie Supplicant 
+ ruijieclient - a powerful ruijie Supplicant for UNIX, base on mystar.
