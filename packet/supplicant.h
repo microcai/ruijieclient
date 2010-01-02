@@ -37,6 +37,6 @@
 
 int ruijie_start_auth(char * name,char*passwd,char* nic_name,int authmode);
 int ruijie_stop_auth();
-int ruijie_get_server_msg( char * raw_encode_message_out,int * length);
+int ruijie_get_server_msg( char * raw_encode_message_out,int length);
 int ruijie_echo();
 #endif /* SUPPLICANT_H_ */
