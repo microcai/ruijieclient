@@ -35,8 +35,26 @@
 
 #define MAKEWORD(hibyte,lobyte) ((hibyte<<8 & 0xFF00)| (lobyte&0XFF))
 
+
+/*
+ *  Return	0	success!
+ *		1	failed.....
+ */
 int ruijie_start_auth(char * name,char*passwd,char* nic_name,int authmode);
+
+/*
+ *  Return	0	always so (-.-|||)
+ */
 int ruijie_stop_auth();
+
+/*
+ *  Return	-1	space allocation of buffer exceeded
+ *		0	did not retrieve any messages from sever.
+ *		int	length of message
+ */
 int ruijie_get_server_msg( char * raw_encode_message_out,int length);
+
+/*
+ */
 int ruijie_echo();
 #endif /* SUPPLICANT_H_ */
