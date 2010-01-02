@@ -1,7 +1,25 @@
-ruijieclient (0.7.9-2) unstable; urgency=high
+ruijieclient (0.8.svn-svn) svn; urgency=low
+
+  * THIS IS A PACKAGE FROM SVN .
+  
+ -- unkonw <unkonw@unkonw> unkonw
+
+ruijieclient (0.8.2-1) karmic; urgency=low
+
+  * some bug fix ( svn 136 )
+  
+ -- G.S.Alex <sthots@gmail.com> Sat, 26 Sep 2009 13:55:33 +0800
+
+ruijieclient (0.7.9-2) karmic; urgency=low
   
   * The net connection would not broke NOW ! 
   * FIXED: re-connect after a fixed time
   * NEW: add support for non-versioned libpcap.so  
 
  -- G.S.Alex <sthots@gmail.com>  Mon, 15 Jun 2009 16:39:53 +0800
+
+ruijieclient (0.7.0-1) karmic; urgency=low
+
+  * Initial release (svn r95)
+
+ -- G.S.Alex <sthots@gmail.com>  Sat, 13 Jun 2009 13:45:47 +0800

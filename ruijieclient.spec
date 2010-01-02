@@ -2,7 +2,7 @@
 %define debug_package %{nil}
 
 Name:      ruijieclient
-Version:   0.8.1
+Version:   0.8.2
 Release:   %{build_number}%{?dist}
 Summary:   a ruijie network supplicant for GNU/Linux
 
@@ -22,7 +22,7 @@ RuijieClient is a ruijie network supplicant for GNU/Linux  which is based on mys
 %setup -q
 
 %build
-##%configure
+%configure
 make %{?_smp_mflags}
 
 %install
