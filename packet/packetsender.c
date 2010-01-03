@@ -351,8 +351,8 @@ int pkt_read_link(const u_char**packet)
   struct pcap_pkthdr *  pkt_hdr;
   int                   ret;
   ret = pcap_next_ex(pcap_handle,&pkt_hdr,packet);
-  if(!ret)
-    memcpy(pkt_buffer,packet,pkt_hdr->caplen);
+//  if(!ret)
+ //   memcpy(pkt_buffer,packet,pkt_hdr->caplen);
   return ret;
 }
 

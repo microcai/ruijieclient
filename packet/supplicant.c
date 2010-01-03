@@ -139,7 +139,7 @@ static u_char           circleCheck[2];
 static u_char           ruijie_dest[6];
 static uint32_t         ruijie_Echo_Key;
 static uint32_t         ruijie_Echo_Diff;
-static const    u_char  ruijie_recv[1500];
+static const    u_char  *ruijie_recv;
 
 static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
 {
@@ -397,7 +397,7 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode)
 
   do
     {
-      while (!pkt_read_link(&ruijie_recv))
+      while (!pkt_read_link(&ruijie_recv) && ruijie_recv )
         {
           switch (ruijie_recv[0x12])
             {
