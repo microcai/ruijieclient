@@ -2,7 +2,7 @@
  * ruijie.vapi
  *
  *  Created on: 2010-1-2
- *      Author: G.S.Alex <i AT gsalex.net > from HIT at Weihai *
+ *      Author: G.S.Alex < i AT gsalex.net > from HIT at Weihai *
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

@@ -20,35 +20,100 @@ public class RuijieDbusObject : Object , RuijieDbusInterface {
 		warning("The DisAuth Method will do nothing till now!");
 		return 1;
 	}
-	public int32	SetPassword(string passwd) throws DBus.Error{
-		this.UserPassword = passwd ;
-		return 0;
+	public signal void StateChanged();
+	
+	
+	//------------------------------------------------------
+	private int32 _state;
+	public int32	get_State()throws DBus.Error{
+		return this._state ;
 	}
-	//public signal void StateChanged();
+	//this will not be part of dbus interface
+	public int32	set_State(int32 v)throws DBus.Error;
 	
-	public int32	State 		{get ; protected set ; default= 0;}
 	
-	public string Message 	{owned get ;protected set ; default= "#!None.";}
+	//------------------------------------------------------
+	private string _message;
+	public string get_Message() throws DBus.Error{
+		return this._message;
+	}
+	//this will not be part of dbus interface
+	public string set_Message(string v) throws DBus.Error;
 	
-	public string NetInterface	{owned get ; private set ; default= "eth0";}
 	
-	public string UserName 	{owned get ; set ; default = "#!None.";}
+	//------------------------------------------------------
+	private string _nic;
+	public string get_NetInterface() throws DBus.Error{
+		return this._nic ;
+	}
+	public string set_NetInterface(string v) throws DBus.Error{
+		//TODO do we need to check it here?
+		this._nic = v ;
+		return this._nic;
+	}
 	
-	private string UserPassword	{owned get ; set ; default = "#!None.";}
 	
-	public int32	AuthenticationMode {get;set;default = 1 ;}
+	//------------------------------------------------------
+	private string _user_name;
+	public string get_UserName() throws DBus.Error{
+		return this._user_name;
+	}
+	public string set_UserName(string v) throws DBus.Error{
+		this._user_name = v;
+		return  this._user_name;
+	}
 	
-	public int32	EchoInterval	{get; set ; default = 25 ;}
 	
-	public bool	IntelligentReconnect {get; set ; default = true ;}
+	//------------------------------------------------------
+	private string _user_pwd;
+	public string set_UserPassword(string v) throws DBus.Error{
+		this._user_pwd = v;
+	}
 	
-	public bool	AutoConnect	{get; set ; default = true ;}
 	
-	public string FakeVersion	{owned get; set ; default = "3.33" ;}
+	//------------------------------------------------------
+	private int32 _auth_mode;
+	public int32	get_AuthenticationMode() throws DBus.Error{
+		return this._auth_mode;
+	}
+	public int32	set_AuthenticationMode(int32 v) throws DBus.Error{
+		//TODO check it
+		this._auth_mode = v;
+		return this._auth_mode ;
+	}
 	
-	public int32	DHCPmode	{get;set;default = 0 ;}
-					
-	public string PingHost	{owned get; set ; default = "4.3.2.1" ;}
+	
+	//------------------------------------------------------
+	public int32	get_EchoInterval() throws DBus.Error;
+	public int32	set_EchoInterval(int32 v) throws DBus.Error;
+	
+	
+	//------------------------------------------------------
+	public bool	get_IntelligentReconnect() throws DBus.Error;
+	public bool	set_IntelligentReconnect(bool v) throws DBus.Error;
+	
+	
+	//------------------------------------------------------
+	public bool	get_AutoConnect() throws DBus.Error;
+	public bool	set_AutoConnect(bool v) throws DBus.Error;
+	
+	
+	//------------------------------------------------------
+	public string get_FakeVersion() throws DBus.Error;
+	public string set_FakeVersion(string v) throws DBus.Error;
+	
+	
+	//------------------------------------------------------
+	public int32	get_DHCPmode() throws DBus.Error;
+	public int32	set_DHCPmode(int32 v) throws DBus.Error;
+	
+	
+	//------------------------------------------------------
+	public string get_PingHost() throws DBus.Error;
+	public string set_PingHost(string v) throws DBus.Error;
+	
+	
+	
 }
 
 public class RuijieDbusServer : Object {
