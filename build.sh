@@ -2,7 +2,7 @@
 
 #this will be replaed by autotools inthe fulture
 
-gen(){
+_gen_vala(){
 	mkdir src
 	valac 	vala/RC_Config.vala \
 		vala/RC_Connection.vala \
@@ -10,8 +10,19 @@ gen(){
 		\
 		-C --pkg gee-1.0 --pkg   ruijie --vapidir=./packet
 	mv ./vala/*.c ./src
+}
+
+gen(){
+	_gen_vala
 	cp ./packet/*.c ./src
 	cp ./packet/*.h ./src
+}
+
+
+test(){
+	_gen_vala
+	cp ./test/*.c ./src
+	cp ./test/*.h ./src
 }
 
 clean(){

@@ -9,7 +9,7 @@ int ruijie_start_auth(char * name,char*passwd,char* nic_name,int authmode){
 	printf ("pswd:%s\n",passwd);
 	printf ("nicn:%s\n",nic_name);
 	printf ("atmd:%d\n",authmode);
-	return 1;
+	return 0;
 }
 
 
