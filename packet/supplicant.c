@@ -139,7 +139,7 @@ static u_char           circleCheck[2];
 static u_char           ruijie_dest[6];
 static uint32_t         ruijie_Echo_Key;
 static uint32_t         ruijie_Echo_Diff;
-static const    u_char* ruijie_recv;
+static const    u_char  ruijie_recv[1500];
 
 static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
 {
@@ -387,7 +387,11 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode)
 
   int success=1,tryed=0;
 
-  pkt_open_link(nic_name);
+  if(pkt_open_link(nic_name))
+	{
+	  fprintf(stderr,"%s",pkt_lasterr());
+	  return-1;
+	}
   gen_ruijie_private_packet(1, 0, "3.33");
   ruijie_start(authmode & 0x1F);
 

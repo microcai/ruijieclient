@@ -114,7 +114,7 @@ AM_CONDITIONAL(USE_XML,[ test "x$have_xml" = "xyes" ])
 
 AS_IF( [ test "x$have_xml" = "xyes" ] ,[ AC_DEFINE([HAVE_LIBXML2],1,[Define to 1 if you have the libxml2 header file])])
 
-AS_IF( [test "x$enable_debug" = "xyes" ] ,[CFLAGS+="-g3 -O0"])
+AS_IF( [test "x$enable_debug" = "xyes" ] ,[CFLAGS=" -g3 -O0"])
 
 AS_IF( [ test "x$with_dbus" = "xyes" ],[
 	PKG_CHECK_MODULES(DBUS,[ dbus-glib-1 ])
@@ -128,5 +128,5 @@ AM_CONDITIONAL(WITH_DBUS,[test "x$with_dbus" = "xyes"])
 AC_CONFIG_FILES([Makefile
                  packet/Makefile
                  configer/Makefile
-                 src/Makefile])
+           		])
 AC_OUTPUT

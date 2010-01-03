@@ -3,6 +3,12 @@ dist_doc_DATA = README
 
 EXTRA_DIST = debian ruijieclient.spec
 
+test.o : test/test.c
+	gcc $< -c -o $@ ${CFLAGS}
+
+ruijieclient: test.o packet/libruijie.a
+	gcc test.o -o $@ -lruijie -L./packet ${CFLAGS} -lpcap
+
 rpm: dist-bzip2
 	mkdir -p ~/rpmbuild/SOURCES/
 	mv ruijieclient-*.tar.bz2 ~/rpmbuild/SOURCES/
