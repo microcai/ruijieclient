@@ -23,6 +23,7 @@
 
 using GLib;
 using Gee;
+using ruijie;
 
 RC_Config 	conf ;
 MainLoop 	loop ;
@@ -73,6 +74,9 @@ int main(string[] args){
 		}
 	
 	loop = new MainLoop(null, false);
+	
+	Connection connect = new Connection();
+	connect.request = Request.Auth ;
 	check_echo();
 	loop.run();
 	return 0;
@@ -91,6 +95,7 @@ int check_echo(){
 //this is just a show case.
 bool send_echo(){
 	stdout.printf("sending_echoing~\n");
+	echo();
 	return true;
 }
 
