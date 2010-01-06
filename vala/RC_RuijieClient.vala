@@ -22,17 +22,17 @@
 
 
 using GLib;
-using Gee;
-using ruijie;
 
 RC_Config 	conf ;
-MainLoop 	loop ;
-
+MainLoop 	loop  ;
+Connection	connection ;
 
 int main(string[] args){
 
 	
 	//TODO some init
+	loop = new MainLoop(null, false);
+	connection = new Connection();
 	conf = new RC_Config();
 	
 	string[] 	split_name	= args[0].split("/");
@@ -45,27 +45,26 @@ int main(string[] args){
 		string[] split_arg = arg.split("=");
 		switch (split_arg[0]) {
 			case "-h":
+			case "-?":
 			case "--help":
 				show_usage(program_name);
 				return 0;
+			case "-V":
 			case "-v":
 			case "--version":
 				show_version();
 				return 0;
-			case "-d":
-				return runas_daemon();
-			case "--confFile":
-				//conf.load_from_file(split_arg[1]);
-				break;
-			case "--userName":		conf["userName"]	=split_arg[1];break;
-			case "--userPassword":		conf["userPassword"]	=split_arg[1];break;
-			case "--authMode":		conf["authMode"]	=split_arg[1];break;
-			case "--NIC":			conf["NIC"]		=split_arg[1];break;
-			case "--echoInterval":		conf["echoInterval"]	=split_arg[1];break;
-			case "--autoReconnect":	conf["autoReconnect"]	=split_arg[1];break;
-			case "--fakeVersion":		conf["fakeVersion"]	=split_arg[1];break;
-			case "--DHCPmode":		conf["DHCPmode"]	=split_arg[1];break;
-			case "--pingHost":		conf["pingHost"]	=split_arg[1];break;
+			case "--confFile":		conf.conf_file_path	=split_arg[1];		break;
+			case "-d":			conf.daemon_mode	=true        ;		break;
+			case "--userName":		conf.user_name		=split_arg[1];		break;
+			case "--userPassword":		conf.user_password	=split_arg[1];		break;
+			case "--authMode":		conf.auth_mode		=split_arg[1].to_int();	break;
+			case "--NIC":			conf.NIC		=split_arg[1];		break;
+			case "--echoInterval":		conf.echo_interval	=split_arg[1].to_int();	break;
+			case "--autoReconnect":	conf.auto_reconnect	=true        ;		break;
+			case "--fakeVersion":		conf.fake_version	=split_arg[1];		break;
+			case "--DHCPmode":		conf.DHCP_mode		=split_arg[1].to_int();	break;
+			case "--pingHost":		conf.ping_host		=split_arg[1];		break;
 			default:
 				stdout.printf("%s: Unknown option %s\n", program_name, arg);
 				show_usage(program_name);
@@ -73,45 +72,40 @@ int main(string[] args){
 			}
 		}
 	
-	loop = new MainLoop(null, false);
 	
-	Connection connect = new Connection();
-	connect.request = Request.Auth ;
-	check_echo();
+	if(conf.daemon_mode ){
+		return runas_daemon();
+	}else{
+		return runas_cli();
+	}
+}
+
+int runas_cli(){
+	connection.auth() ;
 	loop.run();
 	return 0;
 }
-
-int check_echo(){
-	int echo_time=conf["echoInterval"].to_int();
-	if ( echo_time > 5 ){
-		var time = new TimeoutSource.seconds(echo_time);
-		time.set_callback(send_echo);
-		time.attach(loop.get_context());
-		return 0;
-	}
-	return 0;
-}
-//this is just a show case.
-bool send_echo(){
-	stdout.printf("sending_echoing~\n");
-	echo();
-	return true;
-}
-
-
 int runas_daemon(){
 	//TODO daemon mode
 	return 0 ;
 }
+
+
 void show_version(){
 	stdout.printf("Programe under hard work , useless.\n");
 	//TODO eh....say something here.
 }
 
 void show_usage(string program_name) {
+	show_version();
 	stdout.printf("Usage:\n");
-	stdout.printf("  %s [--version] [--help]\n", program_name);
+	stdout.printf("  %s [OPTIONS..]\n\n", program_name);
+	stdout.printf("Help Options:\n");
+	stdout.printf("  -?, --help                         Show help options\n\n");
+	stdout.printf("Application Options:\n");
+	stdout.printf("  i am toooo lazy to write the help information... ");
+	stdout.printf("  ");
+	stdout.printf("  ");
 	//TODO .....
 }
 

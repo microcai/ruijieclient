@@ -20,24 +20,33 @@
  * Boston, MA 02111-1307, USA.
  */
  
-using Gee;
+
  
-public class RC_Config :  HashMap<string,string> {
+public class RC_Config : Object {
+
+	public string user_name = "" ;
+	public string user_password = "";
+	public int	auth_mode = 1 ;
+	public string NIC = "eth0" ;
+	public int	echo_interval {get;set;default = 20 ;}
+	public bool	auto_reconnect = true ;
+	public string fake_version = "3.33" ;
+	public int	DHCP_mode = 0 ;
+	public string ping_host = "1.2.3.4" ;
+	
+	public bool	daemon_mode = false ;
+	public string conf_file_path = "/etc/ruijie.conf" ;
 
 	public RC_Config () {
-		//default values
-		this.set("userName",		"");
-		this.set("userPassword",	"");
-		this.set("authMode",		"1");
-		this.set("NIC",		"eth0");
-		this.set("echoInterval",	"20");
-		this.set("autoReconnect",	"1");
-		this.set("fakeVersion",	"3.33");
-		this.set("DHCPmode",		"0");
-		this.set("pingHost",		"1.2.3.4");
+		this.notify["echo-interval"].connect((s, p) => {connection.load_echo();});
 	}
 	
 	public void load_from_file(string path){
+		message("load_from_file still not work now");
+	}
+	public void save_to_file(string path){
+		message("save_to_file still not work now");
 	
 	}
 }
+

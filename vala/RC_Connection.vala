@@ -29,63 +29,63 @@ enum State {
 	AuthFailed
 }
 
-enum Request {
-	Auth,
-	ReAuth,
-	Logoff,
-	Waiting
-}
+
 
  
 public static class Connection : Object {
 	public int state {get ; private set ; default = State.Unknow ;}
-	public int request { get ; set ; default = Request.Waiting ;}
-	
+
 	public Connection(){
-		this.notify.connect((s, p) => {state_changed();});
-		
+		this.load_echo();
 	}
+
 	
-	private void state_changed(){
-		switch (this.request){
-			case Request.Auth:
-				switch (this.state){
-					case State.Unknow:
-					case State.AuthFailed:
-						do_auth();
-						break;
-				}
-				break;
-			case Request.ReAuth:
-				do_auth();
-				this.request = Request.Auth ;
-				break;
-			case Request.Logoff:
-				switch (this.state){
-					//TODO
-				}
-				do_logoff();
-				break;
-			case Request.Waiting:
-				//nothing?
-				break;
-		}
-	}
-	
-	private void do_auth(){
+	public void auth(){
 		//call auth fuc
 		//TODO check conf 
-		if (start_auth((char[])conf["userName"],(char[])conf["userPassword"],(char[])conf["NIC"],conf["authMode"].to_int())
+		stdout.printf("hi!\n");
+		if (start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) , conf.auth_mode )
 			== 0){
 			this.state = State.AuthSuccessed ;
 			return;
 		}
 		this.state = State.AuthFailed ;
 	}
-	private void do_logoff(){
+	public void logoff(){
 		//call logoff fuc
 		stop_auth();
 	}
+
+
+//echo packet	
+	private TimeoutSource echo_timer ;
+	public void load_echo(){
+		if ( conf == null ){
+			return ;
+		}
+		int echo_time = conf.echo_interval;
+		if ( echo_time >5 ){
+			if ( this.echo_timer != null ){
+				this.echo_timer.destroy();
+			}
+			this.echo_timer = new TimeoutSource.seconds(echo_time);
+			this.echo_timer.set_callback(check_echo);
+			this.echo_timer.attach( loop.get_context());
+		}else{
+			if ( this.echo_timer != null ){
+				this.echo_timer.destroy();
+			}
+			this.echo_timer = null ;
+		}
+	}
+	private bool check_echo(){
+		if( this.state == State.AuthSuccessed ){
+			echo();
+		}
+		return true ;
+	}
 	
 }
+
+
  
