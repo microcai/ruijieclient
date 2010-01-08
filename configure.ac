@@ -11,31 +11,30 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
-USE_DYLIB=0
+AC_ARG_ENABLE(debug,
+                [  --enable-debug Enable DEBUG output. This is a debugging feature  which should not be only enabled by develpoers],
+                [ CFLAGS="$CFLAGS -O0 -DDEBUG" ],
+                [ CFLAGS="$CFLAGS -g0"]
+              )
 
 AC_ARG_ENABLE(dyload,
-			[  --enable-dyload do not link to libpcap.so ,
-			                    but lookup libpcap.so when program starts],
-			[USE_DYLIB=1],
-			[USE_DYLIB=0])
+			[AC_HELP_STRING([--enable-dyload],
+			[do not link to libpcap.so , but lookup libpcap.so when program starts])],[],
+			[with_dyload=yes])
 
-AC_CHECK_LIB([pcap], [main],
-			[
-			
-			if [$USE_DYLIB=0] ; then 
-			  LIBS+=-lpcap
-			else
-			 CFLAGS+=" -DUSE_DYLIB "			 				
-			fi			
-			],      
-            [AC_MSG_FAILURE( libpcap not found!,1)])
+AS_IF( [ test "x$with_dyload" = "xyes"  ],[
+	AC_DEFINE(USE_DYLIBPCAP,1,[Use dlopen to load libpcap])	
+])
 
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-AC_TYPE_UINT8_T
+AC_CHECK_LIB(pcap,pcap_close,
+		[
+			AS_IF( [ test "x$with_dyload" = "xno"  ],[LIBS+= -lpcap],)
+		],
+		[
+			AS_IF( [ test "x$with_dyload" = "xno"  ], [ AC_MSG_FAILURE([libpcap-dev no found],[1]) ])
+		])
 
 AC_C_BIGENDIAN()
 
@@ -48,16 +47,15 @@ AC_CHECK_DECL([INET_ADDRSTRLEN],[],[AC_DEFINE([INET_ADDRSTRLEN],[16],[sizeof(soc
 				]])
 
 AC_CHECK_HEADERS([iconv.h  arpa/inet.h stdlib.h string.h sys/socket.h sys/time.h unistd.h net/ethernet.h])
-AC_CHECK_HEADER([linux/rtnetlink.h],[],[],
+
+AC_CHECK_HEADERS([linux/rtnetlink.h],[],[],
 	[[ #include <sys/types.h>
 	   #include <sys/socket.h>	
 	]])
-
+AC_CHECK_HEADERS([linux/rtnetlink.h])
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lpcap':
 
-AC_CHECK_HEADER(pcap.h,[],
-			AC_MSG_FAILURE( libpcap development files not found!, 1 ))
+AC_CHECK_HEADER([pcap/pcap.h],[],[AC_MSG_FAILURE([pcap.h not found!],1)])
 			
 # important ! here we just determin where the user have got libxml2-devel installed
 
@@ -69,13 +67,8 @@ AC_SUBST_FILE(XML_INCLUDE)
 
 # Checks for header files.
 
-AC_ARG_ENABLE(debug,
-                [  --enable-debug Enable DEBUG output. This is a debugging feature  which should not be only enabled by develpoers],
-                [ CFLAGS="$CFLAGS -g2 -O0 -DDEBUG" ],
-                [ CFLAGS="$CFLAGS -g0 -Os"]
-              )
-             
- 	
+	
 AC_CONFIG_FILES([Makefile
+				 packet/Makefile
                  src/Makefile])
 AC_OUTPUT

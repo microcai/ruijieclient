@@ -96,10 +96,12 @@ int open_lib()
   void  *plibpcap;
   int   index = 0;
 
-  do{
-    plibpcap = dlopen(libpcap[index],RTLD_LOCAL);
-    index ++;
-  }while(plibpcap && index < 4);
+  for(index = 0 ; index < 4 ;index ++ )
+	{
+	  plibpcap = dlopen(libpcap[index],RTLD_NOW);
+	  if(plibpcap)
+		break;
+	}
 
   if(!plibpcap)
     {
@@ -109,7 +111,7 @@ int open_lib()
 // Now bind the fucntion
 
   ppcap_open_live = dlsym(plibpcap,"pcap_open_live");
-#define pcap_open_live(z,x,c,v,b) pcap_open_live(z,x,c,v,b)
+#define pcap_open_live(z,x,c,v,b) ppcap_open_live(z,x,c,v,b)
 
   ppcap_fileno = dlsym(plibpcap,"pcap_fileno");
 #define pcap_fileno(x) ppcap_fileno(x)
@@ -136,6 +138,7 @@ int open_lib()
 #define pcap_close(x) ppcap_close(x)
 
 #endif
+  return 0;
 }
 
 char* pkt_lasterr()

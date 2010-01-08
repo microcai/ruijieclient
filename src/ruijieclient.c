@@ -215,8 +215,8 @@ main(int argc, char* argv[])
   printf("\n\n%s - a powerful ruijie Supplicant for UNIX, base on mystar.\n"
     "Copyright (C) %s %s\n\n"
     "Please see/send bug report to \n%s\n"
-    "or mail to %s \n\n", PACKAGE,"Microcai, sthots, Gong Han, Chen Tingjun, and others",
-    "2009-2010","http://code.google.com/p/ruijieclient/issues/list",
+    "or mail to %s \n\n", PACKAGE,"2009-2010","Microcai, sthots, Gong Han, Chen Tingjun, and others",
+    "http://code.google.com/p/ruijieclient/issues/list",
     PACKAGE_BUGREPORT);
 
   int dhcpstate[4] =
@@ -231,13 +231,14 @@ main(int argc, char* argv[])
    * 2: On, DHCP after authentication
    * 3: On, DHCP after DHCP authentication and re-authentication with new ip
    */
-  int dhcpkey[] = { 0, 1 , 1 , 4 };
+  int dhcpkey[] = { 0, 1 , 1 , 5 };
   do
 	{
-	  ruijie_start_auth(sender.m_name, sender.m_password, sender.m_nic,
+	  if(ruijie_start_auth(sender.m_name, sender.m_password, sender.m_nic,
 		                sender.m_authenticationMode << 16 &
 		                dhcpkey[sender.m_dhcpmode] &
-		                dhcped < 1, ruijie_call_back, 0);
+		                dhcped < 1, ruijie_call_back, 0))
+		return -1;
 	  if (sender.m_dhcpmode != 3 )
 		sender.m_dhcpmode &= 0xFFFFFFFC;
 	  else if (!dhcped)
@@ -249,7 +250,7 @@ main(int argc, char* argv[])
 		  ruijie_echo();
 		}
 	  if (!dhcped) dhcped = start_dhcp() ? 0 : 1;
-	} while (sender.m_dhcpmode == 0 && dhcped == 1);
+	} while (sender.m_dhcpmode && dhcped == 1);
 
   if (sender.m_echoInterval <= 0)
 	{
