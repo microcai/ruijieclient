@@ -46,6 +46,29 @@ enum ruijie_auth_callback_reason
   RUIJIE_AUTH_FAILED = 4,
 };
 
+enum ruijieauthmode
+{
+  /*
+   * dhcp 打开 (DHCP模式)
+   */
+  RUIJIE_AUTHMODE_DHCP = 0x00000001,
+
+  /*
+   * 不使用本机获得的 ip 地址和其他信息 (进行dhcp认证的时候用)
+   */
+  RUIJIE_AUTHMODE_NOIP = 0x00000002 ,
+
+  /*
+   * 不要初始化 计数 :) (dhcp二次认证的时候用到)
+   */
+  RUIJIE_AUTHMODE_NOECHOKEY = 0x00000004 ,
+
+  /*
+   * 使用锐捷私有广播地址
+   */
+  RUIJIE_AUTHMODE_PRIVATEBROADCAST =  0x00010000
+};
+
 /*
  *  Return	0	success!
  *		1	failed.....
