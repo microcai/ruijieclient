@@ -26,13 +26,14 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include "sendpacket.h"
+
 #include "codeconv.h"
 
-#if defined( HAVE_ICONV_H) && defined (_ICONV_H)
+
 int
 code_convert(char *outbuf, size_t outlen, char *inbuf, size_t inlen)
 {
+#if defined( HAVE_ICONV_H) && defined (_ICONV_H)
 
   iconv_t cd;
   char **pin = &inbuf;
@@ -55,45 +56,10 @@ code_convert(char *outbuf, size_t outlen, char *inbuf, size_t inlen)
     }
   iconv_close(cd);
 
+#endif
+
   return 0;
 }
 
-#endif
 
-int
-GetServerMsg(ruijie_packet*this, char*outbuf, size_t buflen)
-{
-  memset(outbuf, 0, buflen);
-  size_t len = ntohs(*((u_int16_t*) (this->pkt_data + 0x10))) - 10;
-  if (buflen < len)
-    // space allocation of buffer exceeded
-    return -1;
-  if (len < 0)
-    // did not retrieve any messages from sever.
-    return 0;
-  char *msgBuf = (typeof(msgBuf)) (this->pkt_data + 0x1c);
 
-  //remove the leading "\r\n" which seems always exist!
-#if defined(DEBUG)
-  puts("-- MSG INFO");
-  printf("## msgBuf(GB) %s\n", msgBuf);
-#endif
-  if (len > 3 && (msgBuf[0] == 0xd) && (msgBuf[1] == 0xa))
-    {
-#ifdef DEBUG
-      puts("@@ /r/n found");
-      puts("-- END");
-#endif
-      msgBuf += 2;
-    }
-#ifdef DEBUG
-  else
-    {
-      puts("@@ /r/n not found");
-      puts("-- END");
-    }
-#endif
-#if defined( HAVE_ICONV_H)
-  code_convert(outbuf, buflen, msgBuf, strlen(msgBuf));
-#endif
-}

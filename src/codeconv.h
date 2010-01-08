@@ -37,12 +37,6 @@
 #include <stdio.h>
 
 /* convert GB codes into UTF-8 */
-#ifdef HAVE_ICONV_H
-int
-code_convert(char *outbuf, size_t outlen, char *inbuf, size_t inlen);
+int code_convert(char *outbuf, size_t outlen, char *inbuf, size_t inlen);
 
-
-#else
-#define code_convert(x,y,z) do{}while(0)
-#endif
 #endif

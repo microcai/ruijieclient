@@ -143,6 +143,21 @@ char* pkt_lasterr()
   return pkt_errbuff;
 }
 
+int pkt_first_link(char nic[])
+{
+
+  struct ifaddrs *ifaddr, *ifaddr_org;
+  getifaddrs(&ifaddr);
+  ifaddr_org = ifaddr;
+  while (ifaddr->ifa_flags & IFF_LOOPBACK)
+	{
+	  ifaddr = ifaddr->ifa_next;
+	}
+//  printf("using nic %s\n", ifaddr->ifa_name);//,ifaddr->ifa_next);
+  strcpy(nic,ifaddr->ifa_name);
+  freeifaddrs(ifaddr_org);
+  return 0;
+}
 
 int pkt_open_link(const char * _nic_name)
 {
@@ -351,8 +366,6 @@ int pkt_read_link(const u_char**packet)
   struct pcap_pkthdr *  pkt_hdr;
   int                   ret;
   ret = pcap_next_ex(pcap_handle,&pkt_hdr,packet);
-  if(!ret)
-    memcpy(pkt_buffer,packet,pkt_hdr->caplen);
   return ret;
 }
 

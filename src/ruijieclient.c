@@ -30,9 +30,9 @@
  */
 
 #include "ruijieclient.h"
-#include "sendpacket.h"
 #include "myerr.h"
 #include "prase.h"
+#include "../packet/supplicant.h"
 
 // fake MAC, e.g. "00:11:D8:44:D5:0D"
 //static char *m_fakeMAC = NULL;
@@ -77,6 +77,25 @@ logoff(int signo)
       ruijie_stop_auth();
     }
   _exit(0);
+}
+
+// return 0 will abort the auth engine
+static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
+{
+  switch(reason)
+  {
+	case RUIJIE_AUTH_FINDSERVER:
+	  break;
+	case RUIJIE_AUTH_NEEDNAME:
+	  break;
+	case RUIJIE_AUTH_NEEDPASSWD:
+	  break;
+	case RUIJIE_AUTH_SUCCESS:
+	  break;
+	case RUIJIE_AUTH_FAILED:
+	  break;
+  }
+  return 0;
 }
 
 int
@@ -129,7 +148,6 @@ main(int argc, char* argv[])
   if (showversion)
     err_quit("%s", PACKAGE_VERSION);
 
-
   // if '-g' is passed as argument then generate a sample configuration
   if (genfile)
     {
@@ -178,14 +196,16 @@ main(int argc, char* argv[])
 
   //print copyright and bug report message
   printf("\n\n%s - a powerful ruijie Supplicant for UNIX, base on mystar.\n"
-    "Copyright %s\n\n"
+    "Copyright (C) %s %s\n\n"
     "Please see/send bug report to \n%s\n"
-    "or mail to %s \n\n", PACKAGE,
-      "Gong Han, Chen Tingjun, Microcai, sthots, and others",
-      "http://code.google.com/p/ruijieclient/issues/list", PACKAGE_BUGREPORT);
+    "or mail to %s \n\n", PACKAGE,"Microcai, sthots, Gong Han, Chen Tingjun, and others",
+    "2009-2010","http://code.google.com/p/ruijieclient/issues/list",
+    PACKAGE_BUGREPORT);
 
 
-  ruijie_start_auth(sender.m_name,sender.m_password,sender.m_nic,sender.m_authenticationMode << 16 & sender.m_dhcpmode );
+  ruijie_start_auth(sender.m_name, sender.m_password, sender.m_nic,
+	                sender.m_authenticationMode << 16 & sender.m_dhcpmode,
+	                ruijie_call_back,0);
 //
 //				case EAP_RESPONSE:
 //				  switch (ruijie_recv[0x16])
