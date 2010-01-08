@@ -32,7 +32,6 @@
 #include "ruijieclient.h"
 #include "sendpacket.h"
 #include "myerr.h"
-#include "blog.h"
 #include "prase.h"
 
 // fake MAC, e.g. "00:11:D8:44:D5:0D"
@@ -75,7 +74,7 @@ logoff(int signo)
 {
   if (sender.m_state)
     {
-      SendEndCertPacket(&sender);
+      ruijie_stop_auth();
     }
   _exit(0);
 }
@@ -146,7 +145,6 @@ main(int argc, char* argv[])
             "Can not kill ruijieclient, permission denied or no such process");
       exit(EXIT_SUCCESS);
     }
-  init_ruijie_packet(&sender);
 
   if (!sender.m_nocofigfile)
     {
@@ -186,97 +184,74 @@ main(int argc, char* argv[])
       "Gong Han, Chen Tingjun, Microcai, sthots, and others",
       "http://code.google.com/p/ruijieclient/issues/list", PACKAGE_BUGREPORT);
 
-  int tryed;
-  for (tryed = 0; (tryed < try_time); ++tryed)
-    {
-      sender.m_state = 0;
-#ifdef DEBUG
-      GetNicParam(&sender);
-#else
-      if (GetNicParam(&sender))
-        err_quit("Err getting net parameters");
-#endif
-LABE_FINDDSERVER:
 
-      FillVersion(&sender); // fill 2 bytes with fake version
-      FlushRecvBuf(&sender);
-      // search for the server
-      if (SendFindServerPacket(&sender))
-        {
-          if (try_time == -1)
-            tryed = 0;
-          continue;
-        }
-      else
-        {
-          fputs("@@ Server found, requesting user name...\n", stdout);
-        }
-      LABLE_SENDNAME: if (SendNamePacket(&sender))
-        {
-          if (try_time == -1)
-            tryed = 0;
-          continue;
-        }
-      else
-        {
-          fputs("@@ User name valid, requesting password...\n", stdout);
-        }
-      //LABLE_SENDPASSWD:
-      switch (SendPasswordPacket(&sender))
-        {
-      case -1:
-        if (try_time == -1)
-          tryed = 0;
-        continue;
-      case 1:
-        /* authenticate fail
-         * possible reasons:
-         * 1. user name and password mismatch
-         * 2. not in the right time-period of net accessing
-         * 3. account has been logged at other computers
-         */
-        GetServerMsg(&sender, u_msgBuf, MAX_U_MSG_LEN);
-        fprintf(stdout, "@@ Authentication failed: %s\n", u_msgBuf);
-        SendEndCertPacket(&sender);
-        if (try_time == -1)
-          tryed = 0;
-        continue;
-      case 0:// Authenticate successfully
-        break;
-        }
+  ruijie_start_auth(sender.m_name,sender.m_password,sender.m_nic,sender.m_authenticationMode << 16 & sender.m_dhcpmode );
+//
+//				case EAP_RESPONSE:
+//				  switch (ruijie_recv[0x16])
+//				  {
+//					case 1: //Type: Identity [RFC3748] (1)
+//					  fputs("@@ Server found, requesting user name...\n", stdout);
+//					  ruijie_ack_name(ruijie_recv[0x13], name);
+//					  break;
+//					case 4://Type: MD5-Challenge [RFC3748] (4)
+//					default:
+//					  fputs("@@ User name valid, requesting password...\n", stdout);
+//					  ruijie_ack_password(ruijie_recv[0x13], name, passwd,
+//						                  ruijie_recv + 0x18, ruijie_recv[0x17]);
+//					  break;
+//				  }
+//				case EAP_SUCCESS:
+//				  ruijie_ripe_success_info();
+//				  success = 0;
+//				  break;
+//				case 1:
+//				  GetServerMsg(&sender, u_msgBuf, MAX_U_MSG_LEN);
+//				  fprintf(stdout, "@@ Authentication failed: %s\n", u_msgBuf);
+//			  }
+//			}
+//		  tryed += success;
+//		  ruijie_start(authmode & 0x1F);
+//		} while (success && tryed < try_time );
+//
+//	  if (success && tryed >= 4)
+//		{
+//		  fprintf(stderr, "##重试太多，退出\n");
+//		  exit(1);
+//		}
+//
+//	  if (sender.m_dhcpmode == 2 && noip_afterauth)
+//		{
+//		  if (system(cmd) == -1)
+//			{
+//			  err_quit(
+//				       "Fail in retrieving network configuration from DHCP server");
+//			}
+//		  noip_afterauth = 0;
+//		}
+//	  GetServerMsg(&sender, u_msgBuf, MAX_U_MSG_LEN);
+//	  fprintf(stdout, "@@ Password valid, SUCCESS:\n## Server Message: %s\n",
+//		      u_msgBuf);
 
-      if (sender.m_dhcpmode == 2 && noip_afterauth)
-        {
-          if (system(cmd) == -1)
-            {
-              err_quit(
-                  "Fail in retrieving network configuration from DHCP server");
-            }
-          noip_afterauth = 0;
-        }
-      GetServerMsg(&sender, u_msgBuf, MAX_U_MSG_LEN);
-      fprintf(stdout, "@@ Password valid, SUCCESS:\n## Server Message: %s\n",
-          u_msgBuf);
-
-      /*
+	  /*
        * DHCP mode:
        * 0: Off
        * 1: On, DHCP mode
        * 2: On, DHCP after authentication
        * 3: On, DHCP after DHCP authentication and re-authentication with new ip
        */
-      if (sender.m_dhcpmode == 3 && sender.m_state == 0)
-        {
-          if( sender.m_state=2)
-          if (system(cmd))
-            {
-              err_quit("DHCP error!");
-            }
-          sender.m_ip = tryed = 0;
-          sender.m_state = 2;
-          SendEchoPacket(&sender);
-          continue; // re-authentication
-        }
+//      if (sender.m_dhcpmode == 3 && sender.m_state == 0)
+//        {
+//          if( sender.m_state=2)
+//          if (system(cmd))
+//            {
+//              err_quit("DHCP error!");
+//            }
+//          sender.m_ip = tryed = 0;
+//          sender.m_state = 2;
+//          SendEchoPacket(&sender);
+//          continue; // re-authentication
+//        }
 
       if (sender.m_echoInterval <= 0)
         {
@@ -296,7 +271,6 @@ LABE_FINDDSERVER:
               err_quit("Init daemon error!");
             }
         }
-      FlushRecvBuf(&sender);
       // start ping monitoring
       if (sender.m_intelligentReconnect == 1)
         {
@@ -305,42 +279,32 @@ LABE_FINDDSERVER:
     	   * so, sleep ! wa haha
     	   */
           sender.m_state = 1;
-          WaitPacket(&sender,sender.m_echoInterval);
-          while (SendEchoPacket(&sender) == 0)
+          while (ruijie_echo() == 0)
             {
-              //printf("heart beat\n");
-              if (IfOnline(&sender))
-                break;
               //Accelerate the speed of detecting
-              WaitPacket(&sender,sender.m_echoInterval);
+       //       WaitPacket(&sender,sender.m_echoInterval);
             }
           // continue this big loop when offline
-          tryed = 0; // or we will not truly re-connect.
-          continue;
+//          tryed = 0; // or we will not truly re-connect.
+//          continue;
+     //   }
+//      if (sender.m_intelligentReconnect > 10)
+//        {
+//          sender.m_state = 1;
+//          time_t time_recon = time(NULL);
+//          while (1)
+//            {
+//              long time_count = time(NULL) - time_recon;
+//              if (time_count >= sender.m_intelligentReconnect)
+//                {
+//                  fputs("Time to reconect!\n", stdout);
+//
+//                  goto LABE_FINDDSERVER;
+//                }
+//              sleep(sender.m_echoInterval);
+//            }
+//        }
         }
-      if (sender.m_intelligentReconnect > 10)
-        {
-          sender.m_state = 1;
-          time_t time_recon = time(NULL);
-          while (1)
-            {
-              long time_count = time(NULL) - time_recon;
-              if (time_count >= sender.m_intelligentReconnect)
-                {
-                  fputs("Time to reconect!\n", stdout);
-
-                  goto LABE_FINDDSERVER;
-                }
-              sleep(sender.m_echoInterval);
-            }
-        }
-//      pcap_close(sender.m_pcap);
-      return EXIT_FAILURE; // this should never happen.
-      break;
-    }// end while
-  if (tryed >= 3)
-    fprintf(stderr, "##重试太多，退出\n");
-  return (EXIT_FAILURE);
 }
 
 static int

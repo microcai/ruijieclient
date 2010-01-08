@@ -1,40 +1,7 @@
-/*******************************************************************************\
- * RuijieClient -- a CLI based Ruijie Client authentication modified from mystar *
- *                                                                               *
- * Copyright (C) Gong Han, Chen Tingjun  microcai                                        *
- \*******************************************************************************/
 
-/*
- * This program is modified from MyStar, the original author is netxray@byhh.
- *
- * Many thanks to netxray@byhh
- *
- * AUTHORS:
- *   Gong Han  <gong AT fedoraproject.org> from CSE@FJNU CN
- *   Chen Tingjun <chentingjun AT gmail.com> from POET@FJNU CN
- *   microcai <microcai AT sina.com> from ZSTU
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include "blog.h"
-
-//static int blogIsInitialized = 0;
+#ifndef TABLES_H_
+#define TABLES_H_
 
 static unsigned char Table[]=
 {
@@ -72,92 +39,7 @@ static unsigned char Table[]=
   0x17,0x6E,0x36,0x7E,0x55,0x4E,0x74,0x5E,0x93,0x2E,0xB2,0x3E,0xD1,0x0E,0xF0,0x1E
 };
 
-//configure the 4 parameters Blog() and FillNetParameter() need.
-
-void
-InitializeBlog(ruijie_packet * this)
-{
-  int iCircle = 0x15;
-  int i, ax = 0, bx = 0, dx = 0;
-
-  // They use it to distinguish star client and non-star client
-  // The only use of function Blog() is to work out circleCheck[2],
-  // with and only with the help of 4 parameters----m_IP, m_NetMask, m_NetGate, m_DNS1
-  u_char sCircleBase[0x15] =
-    { 0x00, 0x00, 0x13, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-  if (this->m_dhcpmode > 0)//Dhcp Enabled
-    {
-      sCircleBase[0x04] = 0x01;
-      this->m_ruijieExtra[0x04] = 0x7f;
-      this->m_ruijieExtra[0x79] = this->m_state==2?0x00:0x01;
-    }
-  else
-    {
-      sCircleBase[0x04] = 0x00;
-      memcpy(sCircleBase + 5, &(this->m_ip), 4);
-   }
-
-  memcpy(sCircleBase + 9, &(this->m_mask), 4);
-  memcpy(sCircleBase + 13, &(this->m_gate), 4);
-  memcpy(sCircleBase + 17, &(this->m_dns), 4);
-
-  for (i = 0; i < iCircle; i++)
-    {
-      dx = ax;
-      bx = 0;
-      bx = (bx & 0xff00) | sCircleBase[i]; // add "( )" by cdx
-      dx &= 0xffff;
-      dx >>= 8;
-      dx ^= bx;
-      bx = 0;
-      bx &= 0x00ff;
-      bx |= (ax & 0xff) << 8;
-
-      ax = Table[dx * 2] | Table[dx * 2 + 1] << 8;
-      ax ^= bx;
-    }
-  this->circleCheck[0] = (unsigned char) ((ax & 0xff00) >> 8);
-  this->circleCheck[1] = (unsigned char) (ax & 0x00ff);
-}
-
-//Fill in some additional information  Ruijie Corp. required.
-//You should call InitializeBlog() before calling this function.
-void
-FillNetParamater(ruijie_packet*l)
-{
-  u_char * ForFill = l->m_ruijieExtra + 0x05;
-  memcpy(ForFill,&(l->m_ip),4);
-  memcpy(ForFill+4,&(l->m_mask),4);
-  memcpy( ForFill +8 , &(l->m_gate),4);
-  memcpy(ForFill + 12, &(l->m_dns),4);
-
-  ForFill[0] = Alog(ForFill[0]);
-  ForFill[1] = Alog(ForFill[1]);
-  ForFill[2] = Alog(ForFill[2]);
-  ForFill[3] = Alog(ForFill[3]);
-
-  ForFill[4] = Alog(ForFill[4]);
-  ForFill[5] = Alog(ForFill[5]);
-  ForFill[6] = Alog(ForFill[6]);
-  ForFill[7] = Alog(ForFill[7]);
-
-  ForFill[8] = Alog(ForFill[8]);
-  ForFill[9] = Alog(ForFill[9]);
-  ForFill[10] = Alog(ForFill[10]);
-  ForFill[11] = Alog(ForFill[11]);
-
-  ForFill[12] = Alog(ForFill[12]);
-  ForFill[13] = Alog(ForFill[13]);
-  ForFill[14] = Alog(ForFill[14]);
-  ForFill[15] = Alog(ForFill[15]);
-
-  ForFill[16] = Alog(l->circleCheck[0]);
-  ForFill[17] = Alog(l->circleCheck[1]);
-}
-
-static u_char AloTable[256] =
+static unsigned char AlogTable[256] =
 {
   0xFF, 0x7F, 0xBF, 0x3F, 0xDF, 0x5F, 0x9F, 0x1F, 0xEF, 0x6F, 0xAF, 0x2F, 0xCF, 0x4F, 0x8F, 0x0F,
   0xF7, 0x77, 0xB7, 0x37, 0xD7, 0x57, 0x97, 0x17, 0xE7, 0x67, 0xA7, 0x27, 0xC7, 0x47, 0x87, 0x07,
@@ -179,9 +61,10 @@ static u_char AloTable[256] =
   0xF0, 0x70, 0xB0, 0x30, 0xD0, 0x50, 0x90, 0x10, 0xE0, 0x60, 0xA0, 0x20, 0xC0, 0x40, 0x80, 0x00
 };
 
-//A transformation of one-byte-for-one-byte
-unsigned char
-Alog(unsigned char BForAlog)
+static unsigned char inline Alog(unsigned char BForAlog)
 {
-  return AloTable[BForAlog];
+  return AlogTable[BForAlog];
 }
+
+
+#endif //TABLES_H_
