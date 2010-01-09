@@ -198,7 +198,7 @@ int pkt_open_link(const char * _nic_name)
   return (0);
 }
 
-int pkt_get_param(int what,struct sockaddr * sa_data)
+int pkt_get_param(int what, struct sockaddr * sa_data)
 {
   static int initialized = 0;
 #ifdef HAVE_NET_IF_DL_H
@@ -258,7 +258,7 @@ int pkt_get_param(int what,struct sockaddr * sa_data)
 #endif
 	}
 
-  ((struct sockaddr_in*)sa_data)->sin_family = PF_INET;
+  ((struct sockaddr_in*) sa_data)->sin_family = PF_INET;
   switch (what)
   {
 	case PKT_PG_HWADDR:
@@ -266,45 +266,49 @@ int pkt_get_param(int what,struct sockaddr * sa_data)
 	  memcpy(sa_data->sa_data, nic_hwaddr, 6);
 	  break;
 	case PKT_PG_IPADDR:
-      ((struct sockaddr_in*)sa_data)->sin_family = AF_INET;
-      ((struct sockaddr_in*)sa_data)->sin_addr.s_addr = nic_ip;
-      break;
-    case PKT_PG_IPMASK:
-      ((struct sockaddr_in*)sa_data)->sin_family = PF_INET;
-      ((struct sockaddr_in*)sa_data)->sin_addr.s_addr = nic_mask;
-      break;
-    case PKT_PG_DEFAULTROUTE:
-      ((struct sockaddr_in*)sa_data)->sin_family = PF_INET;
-      ((struct sockaddr_in*)sa_data)->sin_addr.s_addr = nic_mask ;
-      sa_data->sa_data[3] = 1;
-      break;
-    case PKT_PG_DNS:
-      {
-        FILE    *       fresolv;
-        char            line[128];
-        int             nameserver_ip[4]={0};
+	  ((struct sockaddr_in*) sa_data)->sin_family = AF_INET;
+	  ((struct sockaddr_in*) sa_data)->sin_addr.s_addr = nic_ip;
+	  break;
+	case PKT_PG_IPMASK:
+	  ((struct sockaddr_in*) sa_data)->sin_family = PF_INET;
+	  ((struct sockaddr_in*) sa_data)->sin_addr.s_addr = nic_mask;
+	  break;
+	case PKT_PG_DEFAULTROUTE:
+	  ((struct sockaddr_in*) sa_data)->sin_family = PF_INET;
+	  ((struct sockaddr_in*) sa_data)->sin_addr.s_addr = nic_mask;
+	  sa_data->sa_data[3] = 1;
+	  break;
+	case PKT_PG_DNS:
+	  {
+		FILE * fresolv;
+		char line[128];
+		int nameserver_ip[4] =
+		  { 0 };
 
-        ((struct sockaddr_in*)sa_data)->sin_family = PF_INET;
+		((struct sockaddr_in*) sa_data)->sin_family = PF_INET;
 
-        if(fresolv = fopen("/etc/resolv.conf","r"))
-          {
-            while(fgets(line,80,fresolv) > 0)
-                if(sscanf(line,"nameserver%d.%d.%d.%d", nameserver_ip,nameserver_ip+1,nameserver_ip+2,nameserver_ip+3))break;
+		if (fresolv = fopen("/etc/resolv.conf", "r"))
+		  {
+			while (fgets(line, 80, fresolv) > 0)
+			  if (sscanf(line, "nameserver%d.%d.%d.%d", nameserver_ip,
+				         nameserver_ip + 1, nameserver_ip + 2, nameserver_ip
+				             + 3)) break;
 
-            sa_data->sa_data[2] = nameserver_ip[0];
-            sa_data->sa_data[3] = nameserver_ip[1];
-            sa_data->sa_data[4] = nameserver_ip[2];
-            sa_data->sa_data[5] = nameserver_ip[3];
+			sa_data->sa_data[2] = nameserver_ip[0];
+			sa_data->sa_data[3] = nameserver_ip[1];
+			sa_data->sa_data[4] = nameserver_ip[2];
+			sa_data->sa_data[5] = nameserver_ip[3];
 
-            fclose(fresolv);
-          }
-        else
-          {
-            ((struct sockaddr_in*)sa_data)->sin_addr.s_addr = 0;
-          }
-      }break;
-    default:
-      return -1;
+			fclose(fresolv);
+		  }
+		else
+		  {
+			((struct sockaddr_in*) sa_data)->sin_addr.s_addr = 0;
+		  }
+	  }
+	  break;
+	default:
+	  return -1;
   }
   return 0;
 }
