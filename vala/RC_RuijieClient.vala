@@ -56,6 +56,7 @@ int main(string[] args){
 				return 0;
 			case "--confFile":		conf.conf_file_path	=split_arg[1];		break;
 			case "-d":			conf.daemon_mode	=true        ;		break;
+			case "--gui":			conf.gui_mode		=true        ;		break;
 			case "--userName":		conf.user_name		=split_arg[1];		break;
 			case "--userPassword":		conf.user_password	=split_arg[1];		break;
 			case "--authMode":		conf.auth_mode		=split_arg[1].to_int();	break;
@@ -75,19 +76,31 @@ int main(string[] args){
 	
 	if(conf.daemon_mode ){
 		return runas_daemon();
-	}else{
+	}else if(conf.gui_mode){
+		return runas_gui();
+	}
+	else{
 		return runas_cli();
 	}
 }
 
 int runas_cli(){
-	connection.auth() ;
+	try{
+		connection.auth() ;
+	}catch (AuthFailed e) {
+		message("Auth Failed.");
+		return 1;
+	}
 	loop.run();
 	return 0;
 }
 int runas_daemon(){
 	//TODO daemon mode
 	return 0 ;
+}
+int runas_gui(){
+	new Gui();
+	return 0;
 }
 
 

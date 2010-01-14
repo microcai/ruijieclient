@@ -1,7 +1,7 @@
 /*
- * RC_Config.vala
+ * RC_GTK.vala
  *
- *  Created on: 2010-1-3
+ *  Created on: 2010-1-12
  *      Author: G.S.Alex < i AT gsalex.net > from HIT at Weihai *
  *
  * This program is free software; you can redistribute it and/or
@@ -20,34 +20,34 @@
  * Boston, MA 02111-1307, USA.
  */
  
-
+using Gtk;
  
-public class RC_Config : Object {
-
-	public string user_name = "" ;
-	public string user_password = "";
-	public int	auth_mode = 1 ;
-	public string NIC = "eth0" ;
-	public int	echo_interval {get;set;default = 20 ;}
-	public bool	auto_reconnect = true ;
-	public string fake_version = "3.33" ;
-	public int	DHCP_mode = 0 ;
-	public string ping_host = "1.2.3.4" ;
-	
-	public bool	daemon_mode = false ;
-	public bool	gui_mode = false ;
-	public string conf_file_path = "/etc/ruijie.conf" ;
-
-	public RC_Config () {
-		this.notify["echo-interval"].connect((s, p) => {connection.load_echo();});
-	}
-	
-	public void load_from_file(string path){
-		message("load_from_file still not work now");
-	}
-	public void save_to_file(string path){
-		message("save_to_file still not work now");
-	
+ 
+public class Gui : GLib.Object {
+ 	
+ 	Window main_win ;
+ 	public Gui(){
+ 		string[] ab_args = {""};
+ 		Gtk.init (ref ab_args);
+ 		try {
+			var builder = new Builder ();
+			builder.add_from_file ("./gtkbuilder.glade");
+			builder.connect_signals (this);
+			var main_win = builder.get_object ("window") as Window;
+			main_win.show_all();
+		}catch (Error e){
+			//TODO
+			return ;
+		}
+		Gtk.main ();
+		
+ 	}
+ 	
+	[CCode (instance_pos = -1)]
+	public void quit(Button source){
+		//connection.logoff();
+		Gtk.main_quit();
 	}
 }
 
+ 

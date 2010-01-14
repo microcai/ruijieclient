@@ -29,7 +29,9 @@ enum State {
 	AuthFailed
 }
 
-
+errordomain AuthFailed{
+	Unknow
+}
 
  
 public static class Connection : Object {
@@ -40,16 +42,16 @@ public static class Connection : Object {
 	}
 
 	
-	public void auth(){
+	public void auth() throws AuthFailed {
 		//call auth fuc
 		//TODO check conf 
-		stdout.printf("hi!\n");
 		if (start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) , conf.auth_mode )
 			== 0){
 			this.state = State.AuthSuccessed ;
 			return;
 		}
 		this.state = State.AuthFailed ;
+		throw new AuthFailed.Unknow("") ;
 	}
 	public void logoff(){
 		//call logoff fuc
@@ -79,6 +81,7 @@ public static class Connection : Object {
 		}
 	}
 	private bool check_echo(){
+		message("echoing...");
 		if( this.state == State.AuthSuccessed ){
 			echo();
 		}
