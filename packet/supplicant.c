@@ -141,7 +141,7 @@ static uint32_t         ruijie_Echo_Key;
 static uint32_t         ruijie_Echo_Diff;
 static const u_char* 	ruijie_recv;
 
-static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
+static int gen_ruijie_private_packet(int mode,char*version)
 {
   int iCircle = 0x15;
   int i, ax = 0, bx = 0, dx = 0;
@@ -178,11 +178,15 @@ static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
   ForFill[2] = Alog(so_addr.sa_data[4]);
   ForFill[3] = Alog(so_addr.sa_data[5]);
 
-  if (dhcpmode)//Dhcp Enabled
+  if (mode & RUIJIE_AUTHMODE_DHCP)//Dhcp Enabled
     {
       sCircleBase[0x04] = 0x01;
       ruijie_privatedata[0x04] = 0x7f;
-      ruijie_privatedata[0x79] = dhcpstate & 1; // 1 if first auth in dhcp mode
+      if(mode & RUIJIE_AUTHMODE_NOIP)
+    	ruijie_privatedata[0x79] = 1;
+      else
+    	ruijie_privatedata[0x79]= 0 ;
+      //dhcpstate & 1; // 1 if first auth in dhcp mode
     }
   else
     {
@@ -394,7 +398,7 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
 	  fprintf(stderr,"%s",pkt_lasterr());
 	  return-1;
 	}
-  gen_ruijie_private_packet(1, 0, "3.33");
+  gen_ruijie_private_packet(authmode, "3.33");
   ruijie_start(authmode & 0x1F);
 
   if (authprogress(RUIJIE_AUTH_FINDSERVER, 0, userptr)) return -1;
