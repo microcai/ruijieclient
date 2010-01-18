@@ -372,12 +372,13 @@ int ruijie_echo()
 
 static int ruije_logoff()
 {
+  int ret;
   pkt_build_start();
   pkt_build_8021x(1,2,0,0,0);
   pkt_build_ethernet(ruijie_dest,0,ETH_PROTO_8021X);
-  pkt_write_link();
+  ret = pkt_write_link();
   pkt_close();
-  return 0;
+  return ret;
 }
 
 int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
