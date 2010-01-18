@@ -29,18 +29,53 @@
 #define RJ_PKT_START 01
 #define RJ_PKT_STOP  02
 
-#define EAP_REQUEST     1
+#define EAP_FAILED		1
 #define EAP_RESPONSE    2
 #define EAP_SUCCESS     3
 
+
 #define MAKEWORD(hibyte,lobyte) ((hibyte<<8 & 0xFF00)| (lobyte&0XFF))
 
+enum ruijie_auth_callback_reason
+{
+
+  RUIJIE_AUTH_FINDSERVER = 1,
+  RUIJIE_AUTH_NEEDNAME = 2,
+  RUIJIE_AUTH_NEEDPASSWD = 3,
+  RUIJIE_AUTH_SUCCESS = 0,
+  RUIJIE_AUTH_FAILED = 4,
+};
+
+enum ruijieauthmode
+{
+  /*
+   * dhcp 打开 (DHCP模式)
+   */
+  RUIJIE_AUTHMODE_DHCP = 0x00000001,
+
+  /*
+   * 不使用本机获得的 ip 地址和其他信息 (进行dhcp认证的时候用)
+   */
+  RUIJIE_AUTHMODE_NOIP = 0x00000002 ,
+
+  /*
+   * 不要初始化 计数 :) (dhcp二次认证的时候用到)
+   */
+  RUIJIE_AUTHMODE_NOECHOKEY = 0x00000004 ,
+
+  /*
+   * 使用锐捷私有广播地址
+   */
+  RUIJIE_AUTHMODE_PRIVATEBROADCAST =  0x00010000
+};
 
 /*
  *  Return	0	success!
  *		1	failed.....
  */
-int ruijie_start_auth(char * name,char*passwd,char* nic_name,int authmode);
+int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
+    int (*authprogress)(int reason, const char * current_packet, void*userptr),
+    void * userptr);
 
 /*
  *  Return	0	always so (-.-|||)

@@ -1,4 +1,4 @@
-SUBDIRS = packet configer 
+SUBDIRS = packet src
 dist_doc_DATA = README
 
 EXTRA_DIST = debian ruijieclient.spec
@@ -31,4 +31,5 @@ love:
 	@ echo '        ** **'
 	@ echo '          *'
 	@ echo Make love complete
+	
 	
