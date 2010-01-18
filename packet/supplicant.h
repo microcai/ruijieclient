@@ -1,3 +1,13 @@
+/**
+ * @defgroup 认证函数
+ * @author	 microcai.
+ * @{
+ * @name supplicant.h
+ * @{
+ */
+
+
+
 /*
  * supplicant.h
  *
@@ -36,6 +46,9 @@
 
 #define MAKEWORD(hibyte,lobyte) ((hibyte<<8 & 0xFF00)| (lobyte&0XFF))
 
+/**
+ * @brief 回调函数调用原因
+ */
 enum ruijie_auth_callback_reason
 {
 
@@ -46,7 +59,7 @@ enum ruijie_auth_callback_reason
   RUIJIE_AUTH_FAILED = 4,
 };
 
-enum ruijieauthmode
+enum ruijie_authmode
 {
   /*
    * dhcp 打开 (DHCP模式)
@@ -93,3 +106,7 @@ int ruijie_get_server_msg( char * raw_encode_message_out,int length);
  */
 int ruijie_echo();
 #endif /* SUPPLICANT_H_ */
+
+/**//** @}*/ //
+
+/**//** @}*/ //
