@@ -384,9 +384,11 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
 	int (*authprogress)(int reason, const char * current_packet, void*userptr),
 	    void * userptr)
 {
-  open_lib();
+  if(open_lib())
+	return -1;
 
-  ruijie_Echo_Key = htonl(0x1b8b4563);
+  if(!(authmode & RUIJIE_AUTHMODE_NOECHOKEY))
+	ruijie_Echo_Key = htonl(0x1b8b4563);
 
   char * msg, *utf8_msg;
   int msg_len;
