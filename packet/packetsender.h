@@ -1,3 +1,11 @@
+/**
+ * @defgroup 数据包发送
+ * @author	 microcai.
+ * @{
+ * @name packetsender.h
+ * @{
+ */
+
 /*
  * packetsender.h
  *
@@ -36,10 +44,32 @@
 #define HIBYTE(word) (( ((word) & 0xFF00 ) >>8) & 0xFF)
 #define LOBYTE(word) ( word & 0xFF)
 
+/**
+ * @brief 打开libpcap库
+ * @retval 0 库打开成功 (编译连接到libpcap库的时候总是返回 0 )
+ * @retval -1 无法找到库
+ *
+ * 请在调用其他任何发包函数前调用本函数。
+ */
 int open_lib();
 
+/**
+ * @brief 取得本机第一个网络适配器名称
+ * @param[out] nic 指向一个接收缓冲区，保存接受到的网卡名称
+ * 					该缓冲区一定要足够大，至少容得下网卡名称外加一个 NULL 字符
+ * @return 成功返回0，失败返回 -1
+ */
 int pkt_first_link(char *nic);
-int pkt_open_link(const char * _nic_name);
+
+/**
+ * @brief 打开指定的网络适配器
+ * @param[in] nic_name 网卡名称字符串。该字符串在 Linux 下具有
+ * 					 ethX 的形(X为网卡编号)。可以由 pkt_first_link 获得
+ * @return 成功返回0 , 失败返回-1.
+ *
+ * pkt_open_link 调用成功后才可以使用其他的发送和接收函数。偶在内部维护设备状况
+ */
+int pkt_open_link(const char * nic_name);
 int pkt_build_ruijie(int lengh,const char* ruijiedata);
 int pkt_build_8021x_ext(u_char code, u_char id, uint16_t length,const char* extra);
 int pkt_build_8021x(u_char version, u_char type, uint16_t length,void*paylod,int payloadlen);
@@ -50,3 +80,7 @@ int pkt_close();
 
 
 #endif /* PACKETSENDER_H_ */
+
+/**//** @}*/ //
+
+/**//** @}*/ //
