@@ -38,7 +38,7 @@
 #include "ruijieclient.h"
 #include "myerr.h"
 #include "prase.h"
-#ifdef USE_DBUS
+#include "../packet/supplicant.h"
 #include "dbus.h"
 #endif
 // flag of afterward DHCP status
@@ -92,12 +92,19 @@ int print_state(){
         return 0;
 }
 
-int callback(){
-        printf("I am Callllled~\n");
-        print_state();
+	  break;
+	case RUIJIE_AUTH_NEEDNAME:
+	  break;
+	case RUIJIE_AUTH_NEEDPASSWD:
+	  break;
+	case RUIJIE_AUTH_SUCCESS:
+	  break;
+	case RUIJIE_AUTH_FAILED:
+	  break;
+  }
+  return 0;
 }
 
-#endif
 int
 main(int argc, char* argv[])
 {
@@ -199,11 +206,11 @@ main(int argc, char* argv[])
 
     //print copyright and bug report message
   printf("\n\n%s - a powerful ruijie Supplicant for UNIX, base on mystar.\n"
-    "Copyright %s\n\n"
+    "Copyright (C) %s %s\n\n"
     "Please see/send bug report to \n%s\n"
-    "or mail to %s \n\n", PACKAGE,
-      "Gong Han, Chen Tingjun, Microcai, sthots, and others",
-      "http://code.google.com/p/ruijieclient/issues/list", PACKAGE_BUGREPORT);
+    "or mail to %s \n\n", PACKAGE,"Microcai, sthots, Gong Han, Chen Tingjun, and others",
+    "2009-2010","http://code.google.com/p/ruijieclient/issues/list",
+    PACKAGE_BUGREPORT);
 
 #ifdef USE_DBUS
     g_type_init();
@@ -216,9 +223,7 @@ main(int argc, char* argv[])
 #else
 
 
-
-  int tryed;
-  for (tryed = 0; (tryed < try_time); ++tryed)
+  ruijie_start_auth(sender.m_name,sender.m_password,sender.m_nic,sender.m_authenticationMode << 16 & sender.m_dhcpmode );
     {
       sender.m_state = 0;
 #ifdef DEBUG

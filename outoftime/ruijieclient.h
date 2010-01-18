@@ -34,6 +34,14 @@
 #ifndef RUIJIECLIENT_H
 #define RUIJIECLIENT_H
 
+#ifdef HAVE_CONFIG_H
+#include  <config.h>
+#else
+#error <please run configure>
+#endif
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -44,6 +52,8 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <time.h>
+#include <netinet/in.h>
+#include <net/ethernet.h>
 
 #define MAX_MSG_LEN 1024
 #define MAX_U_MSG_LEN MAX_MSG_LEN*2
@@ -53,5 +63,68 @@
 #define TMP_FILE "/tmp/ruijieclient_tmp"
 
 extern char config_file[256];
+
+typedef struct __ruijie_packet
+{
+  int m_pcap_no;
+
+  int m_lastID; // last ID send form server.
+  int m_MD5value_len; // MD5 key
+  /*
+   * DHCP mode:
+   * 0: Off
+   * 1: On, DHCP before authentication
+   * 2: On, DHCP after authentication
+   * 3: On, DHCP after DHCP authentication and re-authentication
+   *
+   */
+
+  int m_dhcpmode;
+  // auth mode: 0:standard 1:Star private
+  int m_authenticationMode;
+
+  // echo interval, 0 means disable echo
+  int m_echoInterval;
+  // Intelligent Reconnect 0:disable, 1: enable.
+  int m_intelligentReconnect;
+
+  int m_state; //1 if online 2 DHCP mode, 1st auth ok, but need 2nd auth
+
+  // fake version, e.g. "3.22"
+  char *m_fakeVersion;
+
+
+  char  m_name[32]; // user name
+  char  m_password[32]; // password
+  char 	m_nic[32]; // net adapter name
+
+  in_addr_t m_ip;
+  in_addr_t m_mask;
+  in_addr_t m_gate; //Default gateway
+  in_addr_t m_dns;
+  in_addr_t m_pinghost;
+
+  // serial number, initialised when received the first valid Authentication-Success-packet
+  u_int32_t m_Echo_diff;
+  // password private key, initialised at the beginning of function init_ruijiepacket()
+  u_int32_t m_init_Echo_Key; // 0x1b8b4563
+
+  u_char m_MD5value[64]; //private key
+  /*
+   * MAC 帧头 . This is a header that contains both local MAC address
+   * and SERVER MAC address
+   */
+  u_char m_ETHHDR[ETH_HLEN];
+
+  u_char circleCheck[2]; // two magic vaules!
+  u_char* m_ruijieExtra;
+
+
+  struct pcap_pkthdr *pkt_hdr;
+  const u_char *pkt_data;
+  int   m_nocofigfile; // 1 if we should not read from config file
+
+} ruijie_packet;
+
 
 #endif /* RUIJIECLIENT_H */

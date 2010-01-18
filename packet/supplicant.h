@@ -29,18 +29,30 @@
 #define RJ_PKT_START 01
 #define RJ_PKT_STOP  02
 
-#define EAP_REQUEST     1
+#define EAP_FAILED		1
 #define EAP_RESPONSE    2
 #define EAP_SUCCESS     3
 
+
 #define MAKEWORD(hibyte,lobyte) ((hibyte<<8 & 0xFF00)| (lobyte&0XFF))
 
+enum ruijie_auth_callback_reason
+{
+
+  RUIJIE_AUTH_FINDSERVER = 1,
+  RUIJIE_AUTH_NEEDNAME = 2,
+  RUIJIE_AUTH_NEEDPASSWD = 3,
+  RUIJIE_AUTH_SUCCESS = 0,
+  RUIJIE_AUTH_FAILED = 4,
+};
 
 /*
  *  Return	0	success!
  *		1	failed.....
  */
-int ruijie_start_auth(char * name,char*passwd,char* nic_name,int authmode);
+int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
+    int (*authprogress)(int reason, const char * current_packet, void*userptr),
+    void * userptr);
 
 /*
  *  Return	0	always so (-.-|||)
