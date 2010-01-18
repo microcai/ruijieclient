@@ -104,15 +104,20 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
     int (*authprogress)(int reason, const char * current_packet, void*userptr),
     void * userptr);
 
-/*
- *  Return	0	always so (-.-|||)
+/**
+ * @brief 停止认证
+ * @return 应该总数反回0，如果不是，一定是不可恢复的错误。
  */
 int ruijie_stop_auth();
 
-/*
- *  Return	-1	space allocation of buffer exceeded
- *		0	did not retrieve any messages from sever.
- *		int	length of message
+/**
+ * @brief 返回认证服务器发回的消息
+ * @param[out]  raw_encode_message_out
+ * 				原始编码的服务器消息。服务器消息具体是何种编码不做解释。多数情况下是GBK编码的
+ * @param[in]	length 输出消息缓存的长度。
+ * @return 消息的字节数。
+ * @retval -1 length长度不够
+ * @retval 0 服务器没有返回消息或者消息提取失败
  */
 int ruijie_get_server_msg( char * raw_encode_message_out,int length);
 
