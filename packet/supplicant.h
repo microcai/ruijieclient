@@ -53,38 +53,52 @@ enum ruijie_auth_callback_reason
 {
 
   RUIJIE_AUTH_FINDSERVER = 1,
+  /**< 在查找服务器。返回-1停止查找。结束认证*/
+
   RUIJIE_AUTH_NEEDNAME = 2,
+  /**< 服务器需要用名*/
+
   RUIJIE_AUTH_NEEDPASSWD = 3,
+  /**<服务器需要密码*/
   RUIJIE_AUTH_SUCCESS = 0,
+  /**<服务器通过认证*/
   RUIJIE_AUTH_FAILED = 4,
+  /**<服务器拒绝认证*/
 };
 
+/**
+ * @brief 认证模式
+ */
 enum ruijie_authmode
 {
-  /*
-   * dhcp 打开 (DHCP模式)
-   */
   RUIJIE_AUTHMODE_DHCP = 0x00000001,
+  /**<dhcp 打开 (DHCP模式)*/
 
-  /*
-   * 不使用本机获得的 ip 地址和其他信息 (进行dhcp认证的时候用)
-   */
   RUIJIE_AUTHMODE_NOIP = 0x00000002 ,
+  /**<不使用本机获得的 ip 地址和其他信息 (进行dhcp认证，此时本机没有可用
+   * 的ip地址的时候使用)*/
 
-  /*
-   * 不要初始化 计数 :) (dhcp二次认证的时候用到)
-   */
   RUIJIE_AUTHMODE_NOECHOKEY = 0x00000004 ,
+  /**<不要初始化 心跳包计数器 :)
+   * (二次dhcp认证的时候用到)*/
 
-  /*
-   * 使用锐捷私有广播地址
-   */
   RUIJIE_AUTHMODE_PRIVATEBROADCAST =  0x00010000
+  /**<使用锐捷私有广播地址，而不是标准的MAC层广播协议地址*/
 };
 
-/*
- *  Return	0	success!
- *		1	failed.....
+/**
+ * @brief 进行认证
+ * @param[in] name 认证用户名
+ * @param[in] passwd 明文 密码
+ * @param[in] nic_name 使用的网卡名称，可以使用 pkt_first_link 获得首个可用的网卡名称
+ * @param[in] authmode	认证模式 参考 ruijie_authmode
+ * @param[in] authprogress	回调函数地址。
+ * @param[in] userptr		传递给回调函数的数据
+ *
+ * @retval	0	success!
+ * @retval  1	failed.....
+ *
+ * @see pkt_first_link ruijie_authmode
  */
 int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
     int (*authprogress)(int reason, const char * current_packet, void*userptr),
