@@ -3,7 +3,6 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="window">
-    <signal name="destroy" handler="gquit"/>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -156,6 +155,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="resize_mode">immediate</property>
+                <signal name="clicked" handler="gui_auth"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -170,6 +170,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="gui_logoff"/>
               </object>
               <packing>
                 <property name="expand">False</property>

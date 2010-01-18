@@ -37,7 +37,7 @@ int main(string[] args){
 	
 	string[] 	split_name	= args[0].split("/");
 	string 	program_name 	= split_name[split_name.length - 1];
-	string 	command 	= string.joinv(" ", args);
+	//string 	command 	= string.joinv(" ", args);
 	
 	for (int i = 1; i < args.length; i++) {
 		string arg = args[i];

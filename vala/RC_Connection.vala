@@ -51,11 +51,14 @@ public static class Connection : Object {
 			return;
 		}
 		this.state = State.AuthFailed ;
+		//caicai will not tell me more information ....
 		throw new AuthFailed.Unknow("") ;
 	}
 	public void logoff(){
-		//call logoff fuc
-		stop_auth();
+		//caicai didn't offer a good library,so we need some hack here
+		if ( this.state == State.AuthSuccessed){
+			stop_auth();
+		}
 	}
 
 

@@ -33,7 +33,7 @@ public class Gui : GLib.Object {
 			var builder = new Builder ();
 			builder.add_from_file ("./gtkbuilder.glade");
 			builder.connect_signals (this);
-			var main_win = builder.get_object ("window") as Window;
+			main_win = builder.get_object ("window") as Window;
 			main_win.show_all();
 		}catch (Error e){
 			//TODO
@@ -47,6 +47,20 @@ public class Gui : GLib.Object {
 	public void quit(Button source){
 		//connection.logoff();
 		Gtk.main_quit();
+	}
+	
+	[CCode (instance_pos = -1)]
+	public void auth(Button sourve){
+		try{
+			connection.auth() ;
+		}catch (AuthFailed e) {
+			message("Auth Failed.//TODO gui info");
+		}
+	}
+	
+	[CCode (instance_pos = -1)]
+	public void logoff(Button source){
+		connection.logoff();
 	}
 }
 
