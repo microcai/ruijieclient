@@ -106,7 +106,7 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
 
 /**
  * @brief 停止认证
- * @return 应该总数反回0，如果不是，一定是不可恢复的错误。
+ * @return 应该总是反回0，如果不是，一定是不可恢复的错误。
  */
 int ruijie_stop_auth();
 
@@ -121,7 +121,13 @@ int ruijie_stop_auth();
  */
 int ruijie_get_server_msg( char * raw_encode_message_out,int length);
 
-/*
+/**
+ * @brief 执行心跳发包
+ * @return 成功发送返回0 ，发送失败或者发送的时候已经下线返回 -1
+ *
+ *
+ * ruijie_echo 内部维护心跳计数，该数字在认证成功后从服务器发回的数据包中取得。
+ * 然后每次发送都递增。最好在20s左右时间重复发送(调用即可)
  */
 int ruijie_echo();
 #endif /* SUPPLICANT_H_ */
