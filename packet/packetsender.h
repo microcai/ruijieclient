@@ -38,8 +38,8 @@
 
 int open_lib();
 
+int pkt_first_link(char *nic);
 int pkt_open_link(const char * _nic_name);
-
 int pkt_build_ruijie(int lengh,const char* ruijiedata);
 int pkt_build_8021x_ext(u_char code, u_char id, uint16_t length,const char* extra);
 int pkt_build_8021x(u_char version, u_char type, uint16_t length,void*paylod,int payloadlen);

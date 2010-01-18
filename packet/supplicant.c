@@ -139,9 +139,9 @@ static u_char           circleCheck[2];
 static u_char           ruijie_dest[6];
 static uint32_t         ruijie_Echo_Key;
 static uint32_t         ruijie_Echo_Diff;
-static const    u_char  *ruijie_recv;
+static const u_char* 	ruijie_recv;
 
-static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
+static int gen_ruijie_private_packet(int mode,char*version)
 {
   int iCircle = 0x15;
   int i, ax = 0, bx = 0, dx = 0;
@@ -178,11 +178,15 @@ static int gen_ruijie_private_packet(int dhcpstate,int dhcpmode,char*version)
   ForFill[2] = Alog(so_addr.sa_data[4]);
   ForFill[3] = Alog(so_addr.sa_data[5]);
 
-  if (dhcpmode)//Dhcp Enabled
+  if (mode & RUIJIE_AUTHMODE_DHCP)//Dhcp Enabled
     {
       sCircleBase[0x04] = 0x01;
       ruijie_privatedata[0x04] = 0x7f;
-      ruijie_privatedata[0x79] = dhcpstate & 1; // 1 if first auth in dhcp mode
+      if(mode & RUIJIE_AUTHMODE_NOIP)
+    	ruijie_privatedata[0x79] = 1;
+      else
+    	ruijie_privatedata[0x79]= 0 ;
+      //dhcpstate & 1; // 1 if first auth in dhcp mode
     }
   else
     {
@@ -376,11 +380,15 @@ static int ruije_logoff()
   return 0;
 }
 
-int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode)
+int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
+	int (*authprogress)(int reason, const char * current_packet, void*userptr),
+	    void * userptr)
 {
-  open_lib();
+  if(open_lib())
+	return -1;
 
-  ruijie_Echo_Key = htonl(0x1b8b4563);
+  if(!(authmode & RUIJIE_AUTHMODE_NOECHOKEY))
+	ruijie_Echo_Key = htonl(0x1b8b4563);
 
   char * msg, *utf8_msg;
   int msg_len;
@@ -392,28 +400,37 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode)
 	  fprintf(stderr,"%s",pkt_lasterr());
 	  return-1;
 	}
-  gen_ruijie_private_packet(1, 0, "3.33");
+  gen_ruijie_private_packet(authmode, "3.33");
   ruijie_start(authmode & 0x1F);
+
+  if (authprogress(RUIJIE_AUTH_FINDSERVER, 0, userptr)) return -1;
 
   do
     {
       while (!pkt_read_link(&ruijie_recv) && ruijie_recv )
         {
-          switch (ruijie_recv[0x12])
+          switch ( ruijie_recv[0x12])
             {
+          case EAP_FAILED:
+        	authprogress(RUIJIE_AUTH_FAILED,ruijie_recv,userptr);
+        	break;
           case EAP_RESPONSE:
             switch (ruijie_recv[0x16])
               {
             case 1: //Type: Identity [RFC3748] (1)
+              if (authprogress(RUIJIE_AUTH_NEEDNAME, ruijie_recv, userptr)) return -1;
               ruijie_ack_name(ruijie_recv[0x13], name);
               break;
             case 4://Type: MD5-Challenge [RFC3748] (4)
             default:
+              if(authprogress(RUIJIE_AUTH_NEEDPASSWD,ruijie_recv,userptr)) return -1;
               ruijie_ack_password(ruijie_recv[0x13], name, passwd, ruijie_recv + 0x18, ruijie_recv[0x17]);
               break;
               }
+            break;
           case EAP_SUCCESS:
             ruijie_ripe_success_info();
+            if (authprogress(RUIJIE_AUTH_SUCCESS, ruijie_recv, userptr)) return -1;
             success = 0;
             break;
             }
