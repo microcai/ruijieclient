@@ -218,64 +218,62 @@ main(int argc, char* argv[])
     "or mail to %s \n\n", PACKAGE,"2009-2010","Microcai, sthots, Gong Han, Chen Tingjun, and others",
     "http://code.google.com/p/ruijieclient/issues/list",
     PACKAGE_BUGREPORT);
-
-  int dhcpstate[4] =
-	{ 1, 1, 0, 0 };
-
-  int dhcped = dhcpstate[sender.m_dhcpmode];
-
-  /*
-   * DHCP mode:
-   * 0: Off
-   * 1: On, DHCP mode
-   * 2: On, DHCP after authentication
-   * 3: On, DHCP after DHCP authentication and re-authentication with new ip
-   */
-  int dhcpkey[] = { 0, 1 , 1 , 5 };
   do
 	{
-	  if(ruijie_start_auth(sender.m_name, sender.m_password, sender.m_nic,
-		                sender.m_authenticationMode << 16 &
-		                dhcpkey[sender.m_dhcpmode] &
-		                dhcped < 1, ruijie_call_back, 0))
-		return -1;
-	  if (sender.m_dhcpmode != 3 )
-		sender.m_dhcpmode &= 0xFFFFFFFC;
-	  else if (!dhcped)
+	  int dhcpstate[4] =
+		{ 1, 1, 0, 0 };
+
+	  int dhcped = dhcpstate[sender.m_dhcpmode];
+
+	  /*
+	   * DHCP mode:
+	   * 0: Off
+	   * 1: On, DHCP mode
+	   * 2: On, DHCP after authentication
+	   * 3: On, DHCP after DHCP authentication and re-authentication with new ip
+	   */
+	  int dhcpkey[] =
+		{ 0, 1, 1, 5 };
+	  do
 		{
-		  sender.m_dhcpmode = 0 ;
+		  if (ruijie_start_auth(sender.m_name, sender.m_password, sender.m_nic,
+			                    sender.m_authenticationMode << 16
+			                        & dhcpkey[sender.m_dhcpmode] & dhcped < 1,
+			                    ruijie_call_back, 0)) return -1;
+		  if (sender.m_dhcpmode != 3)
+			sender.m_dhcpmode &= 0xFFFFFFFC;
+		  else if (!dhcped)
+			{
+			  sender.m_dhcpmode = 0;
+			}
+		  else
+			{
+			  ruijie_echo();
+			}
+		  if (!dhcped) dhcped = start_dhcp() ? 0 : 1;
+		} while (sender.m_dhcpmode && dhcped == 1);
+
+	  if (sender.m_echoInterval <= 0)
+		{
+		  pkt_close();
+		  return 0; //user has echo disabled
 		}
+	  // continue echoing
+	  if (nodaemon)
+		fputs("Keeping sending echo...\nPress Ctrl+C to logoff \n", stdout);
 	  else
 		{
-		  ruijie_echo();
+		  fprintf(stdout,
+			      "Daemonize and Keeping sending echo...\nUse %s -K to quit",
+			      PACKAGE_TARNAME);
+		  if (daemon(0, 0))
+			{
+			  err_quit("Init daemon error!");
+			}
 		}
-	  if (!dhcped) dhcped = start_dhcp() ? 0 : 1;
-	} while (sender.m_dhcpmode && dhcped == 1);
 
-  if (sender.m_echoInterval <= 0)
-	{
-	  pkt_close();
-	  return 0; //user has echo disabled
-	}
-  // continue echoing
-  if (nodaemon)
-	fputs("Keeping sending echo...\nPress Ctrl+C to logoff \n", stdout);
-  else
-	{
-	  fprintf(stdout,
-		      "Daemonize and Keeping sending echo...\nUse %s -K to quit",
-		      PACKAGE_TARNAME);
-	  if (daemon(0, 0))
-		{
-		  err_quit("Init daemon error!");
-		}
-	}
-
-  // start ping monitoring
-  if (sender.m_intelligentReconnect == 1)
-	{
-	  /*
-	   * Why the hell we should send echo packet immediately?
+	  // start ping monitoring
+	  /* Why the hell we should send echo packet immediately?
 	   * so, sleep ! wa haha
 	   */
 	  while (!ruijie_echo())
@@ -284,7 +282,8 @@ main(int argc, char* argv[])
 		  //       WaitPacket(&sender,sender.m_echoInterval);
 		  sleep(sender.m_echoInterval);
 		}
-	}
+	} while (sender.m_intelligentReconnect == 1);
+  return 1;
 }
 
 static int
