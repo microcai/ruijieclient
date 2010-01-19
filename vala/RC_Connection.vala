@@ -22,15 +22,22 @@
  
 using ruijie;
  
+ 
+
 enum State {
 	Unknow,
-	Authing,
+	Authing_Search_Server,
+	Authing_Sending_Inform,
+	Authing_done,
 	AuthSuccessed,
-	AuthFailed
+	AuthFailed,
+	Canceling
 }
 
 errordomain AuthFailed{
-	Unknow
+	Unknow,
+	No_Server_Found,
+	Inform_Error,
 }
 
  
@@ -41,11 +48,30 @@ public static class Connection : Object {
 		this.load_echo();
 	}
 
-	
+	public static int auth_callbcak( int reason, string current_packet ,void * userptr ){
+		Connection con = (Connection) userptr ;
+		if (con.state == State.Canceling ) { 
+			if ( reason == auth_callback_reason.RUIJIE_AUTH_SUCCESS ){
+				con.logoff();
+			}
+			return -1 ;
+		}
+		switch ( reason ){
+			//i do think ruijie_auth_callback_reason is ugly designed.
+			case auth_callback_reason.RUIJIE_AUTH_FINDSERVER : con.state = State.Authing_Sending_Inform ; break;
+			case auth_callback_reason.RUIJIE_AUTH_NEEDNAME :  con.state = State.Authing_Sending_Inform ; break;
+			case auth_callback_reason.RUIJIE_AUTH_NEEDPASSWD : con.state = State.Authing_done ; break;
+			case auth_callback_reason.RUIJIE_AUTH_SUCCESS : con.state = State.AuthSuccessed ; break;
+			case auth_callback_reason.RUIJIE_AUTH_FAILED : con.state = State.AuthFailed ; break;
+			default: message("auth callback returned an unexpected state!") ; break ;
+		}
+		return 0;
+	}
 	public void auth() throws AuthFailed {
 		//call auth fuc
 		//TODO check conf 
-		if (start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) , conf.auth_mode )
+		if (start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
+				, conf.auth_mode ,auth_callbcak,this)
 			== 0){
 			this.state = State.AuthSuccessed ;
 			return;
@@ -94,4 +120,32 @@ public static class Connection : Object {
 }
 
 
- 
+//some code for binding.
+enum auth_callback_reason{
+		RUIJIE_AUTH_FINDSERVER = 1,
+		RUIJIE_AUTH_NEEDNAME = 2,
+		RUIJIE_AUTH_NEEDPASSWD = 3,
+		RUIJIE_AUTH_SUCCESS = 0,
+		RUIJIE_AUTH_FAILED = 4,
+}
+enum authmode{
+		/*
+	 	* dhcp 打开 (DHCP模式)
+	 	*/
+		RUIJIE_AUTHMODE_DHCP = 0x00000001,
+		
+		/*
+		* 不使用本机获得的 ip 地址和其他信息 (进行dhcp认证的时候用)
+	 	*/
+		RUIJIE_AUTHMODE_NOIP = 0x00000002 ,
+
+		/*
+	 	* 不要初始化 计数 :) (dhcp二次认证的时候用到)
+	 	*/
+		RUIJIE_AUTHMODE_NOECHOKEY = 0x00000004 ,
+
+		/*
+		* 使用锐捷私有广播地址
+		*/
+		RUIJIE_AUTHMODE_PRIVATEBROADCAST =  0x00010000
+}
