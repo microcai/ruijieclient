@@ -4,20 +4,19 @@
  *  Created on: 2010-1-3
  *      Author: G.S.Alex < i AT gsalex.net > from HIT at Weihai *
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
  
 using ruijie;
@@ -27,58 +26,47 @@ using ruijie;
 enum State {
 	Unknow,
 	Authing_Search_Server,
-	Authing_Sending_Inform,
+	Authing_Sending_UserName,
+	Authing_Sending_Password,
 	Authing_done,
 	AuthSuccessed,
 	AuthFailed,
 	Canceling
 }
 
-errordomain AuthFailed{
-	Unknow,
-	No_Server_Found,
-	Inform_Error,
-}
+
 
  
 public static class Connection : Object {
+	public int pre_state {get ; private set ; default = State.Unknow ;}
 	public int state {get ; private set ; default = State.Unknow ;}
 
 	public Connection(){
 		this.load_echo();
 	}
 
-	public static int auth_callbcak( int reason, string current_packet ,void * userptr ){
+	public static int auth_callbcak( int reason, string? current_packet ,void * userptr ){
 		Connection con = (Connection) userptr ;
 		if (con.state == State.Canceling ) { 
 			if ( reason == auth_callback_reason.RUIJIE_AUTH_SUCCESS ){
-				con.logoff();
+				stop_auth();
 			}
 			return -1 ;
 		}
 		switch ( reason ){
 			//i do think ruijie_auth_callback_reason is ugly designed.
-			case auth_callback_reason.RUIJIE_AUTH_FINDSERVER : con.state = State.Authing_Sending_Inform ; break;
-			case auth_callback_reason.RUIJIE_AUTH_NEEDNAME :  con.state = State.Authing_Sending_Inform ; break;
-			case auth_callback_reason.RUIJIE_AUTH_NEEDPASSWD : con.state = State.Authing_done ; break;
+			case auth_callback_reason.RUIJIE_AUTH_FINDSERVER : con.state = State.Authing_Search_Server ; break;
+			case auth_callback_reason.RUIJIE_AUTH_NEEDNAME :  con.state = State.Authing_Sending_UserName ; break;
+			case auth_callback_reason.RUIJIE_AUTH_NEEDPASSWD : con.state = State.Authing_Sending_Password ; break;
 			case auth_callback_reason.RUIJIE_AUTH_SUCCESS : con.state = State.AuthSuccessed ; break;
 			case auth_callback_reason.RUIJIE_AUTH_FAILED : con.state = State.AuthFailed ; break;
 			default: message("auth callback returned an unexpected state!") ; break ;
 		}
 		return 0;
 	}
-	public void auth() throws AuthFailed {
-		//call auth fuc
-		//TODO check conf 
-		if (start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
-				, conf.auth_mode ,auth_callbcak,this)
-			== 0){
-			this.state = State.AuthSuccessed ;
-			return;
-		}
-		this.state = State.AuthFailed ;
-		//caicai will not tell me more information ....
-		throw new AuthFailed.Unknow("") ;
+	public void auth() {
+		start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
+				, conf.auth_mode ,auth_callbcak,this);
 	}
 	public void logoff(){
 		//caicai didn't offer a good library,so we need some hack here

@@ -8,8 +8,9 @@ _gen_vala(){
 		vala/RC_Connection.vala \
 		vala/RC_RuijieClient.vala \
 		vala/RC_GTK.vala \
+		vala/RC_CLI.vala \
 		\
-		-C --pkg gee-1.0 --pkg gmodule-2.0 --pkg gtk+-2.0  --pkg   ruijie --vapidir=./packet
+		-C --pkg gee-1.0 --pkg Config --pkg gmodule-2.0 --pkg gtk+-2.0  --pkg   ruijie --vapidir=./vala
 	mv ./vala/*.c ./src
 }
 
@@ -17,6 +18,7 @@ gen(){
 	_gen_vala
 	cp ./packet/*.c ./src
 	cp ./packet/*.h ./src
+	cp ./test/config.h ./src
 }
 
 

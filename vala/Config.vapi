@@ -1,7 +1,7 @@
 /*
- * RC_Connection_Delect.vala
+ * RC_CLI.vala
  *
- *  Created on: 2010-1-3
+ *  Created on: 2010-1-20
  *      Author: G.S.Alex < i AT gsalex.net > from HIT at Weihai *
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,4 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
+[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "config.h")]
+namespace Config
+{
+	public const string GETTEXT_PACKAGE;
+	public const string APP_NAME;
+	public const string LOCALE_DIR;
+	public const string APP_VERSION;
+	public const string LOGO_PATH;
+	public const string AUTHORS;
+}
+
