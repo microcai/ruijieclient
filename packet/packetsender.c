@@ -183,6 +183,8 @@ int pkt_open_link(const char * _nic_name)
 				nic_name, pcap_errbuf);
 		return -1;
 	}
+	struct sockaddr	soaddr;
+	pkt_get_param(SIOCGIFHWADDR,&soaddr);
 
 	snprintf(filter_buf, sizeof(filter_buf), FILTER_STR, nic_hwaddr[0],
 			nic_hwaddr[0], nic_hwaddr[0], nic_hwaddr[0], nic_hwaddr[0],
