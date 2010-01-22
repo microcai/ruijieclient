@@ -33,14 +33,35 @@ public class Gui : GLib.Object {
 			builder.add_from_file ("./gtkbuilder.glade");
 			builder.connect_signals (this);
 			main_win = builder.get_object ("window") as Window;
-			main_win.show_all();
+			this.init_content(builder);
+			
 		}catch (Error e){
 			//TODO
 			return ;
 		}
-		Gtk.main ();
 		
+		connection.notify["state"].connect(gtk_state_change);
+		main_win.show_all();
+		Gtk.main ();
  	}
+ 	
+ 	Entry entry_username	;
+ 	Entry entry_password	;
+ 	Entry entry_nic	;
+ 	private void init_content(Builder builder){
+ 		this.entry_username = builder.get_object ("entry_username") as Entry ;
+ 		this.entry_password = builder.get_object ("entry_password") as Entry ;
+ 		this.entry_nic	= builder.get_object ("entry_nic") as Entry ;
+ 		
+ 		this.entry_username.text = conf.user_name ;
+ 		this.entry_password.text = conf.user_password ;
+ 		this.entry_nic.text	= conf.NIC ;
+ 	}
+ 	
+ 	public void gtk_state_change(){
+ 		stdout.printf("state:%i\n",connection.state);
+ 	}
+ 	
  	
 	[CCode (instance_pos = -1)]
 	public void quit(Button source){

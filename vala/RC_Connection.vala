@@ -37,9 +37,9 @@ enum State {
 
 
  
-public static class Connection : Object {
+public class Connection : Object {
 	public int pre_state {get ; private set ; default = State.Unknow ;}
-	public int state {get ; private set ; default = State.Unknow ;}
+	public int state {get ; set ; default = State.Unknow ;}
 
 	public Connection(){
 		this.load_echo();
@@ -64,9 +64,15 @@ public static class Connection : Object {
 		}
 		return 0;
 	}
-	public void auth() {
-		start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
-				, conf.auth_mode ,auth_callbcak,this);
+	public void auth(){
+		//lock(this.state){
+			Thread.create(_auth, false);
+		//}
+	}
+	public void* _auth() {
+			start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
+					, conf.auth_mode ,auth_callbcak,this);
+			return null;
 	}
 	public void logoff(){
 		//caicai didn't offer a good library,so we need some hack here
