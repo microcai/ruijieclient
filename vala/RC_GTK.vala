@@ -20,28 +20,42 @@
  */
  
 using Gtk;
+using DBus;
  
  
 public class Gui : GLib.Object {
+
+
  	
  	Window main_win ;
  	public Gui(){
  		string[] ab_args = {""};
  		Gtk.init (ref ab_args);
+		Builder builder ;
  		try {
-			var builder = new Builder ();
+ 			builder = new Builder ();
 			builder.add_from_file ("./gtkbuilder.glade");
 			builder.connect_signals (this);
 			main_win = builder.get_object ("window") as Window;
 			this.init_content(builder);
-			
-		}catch (Error e){
+			main_win.show_all();
+		}catch (GLib.Error e){
 			//TODO
 			return ;
 		}
 		
 		connection.notify["state"].connect(gtk_state_change);
-		main_win.show_all();
+		Table table = builder.get_object ("table_set") as Table;
+		entry_nic.hide();
+ 			NICBox box ;
+		try{ 
+			box = new NICBox();
+ 		}catch (GLib.Error e){
+ 			message("Cann't connect to NetworkManager.");
+ 			entry_nic.show_all();
+ 		}
+		table.attach(box.get_box(),1,2,2,3,AttachOptions.FILL,AttachOptions.FILL,10,0);
+		box.get_box().show_all();
 		Gtk.main ();
  	}
  	
@@ -80,4 +94,52 @@ public class Gui : GLib.Object {
 	}
 }
 
- 
+
+public class NICBox  {
+	
+	private ComboBox box = new ComboBox.text();
+	struct NIC {
+		public string nic;
+		public string detail;
+	}
+	private NIC[] nics ;
+	
+	public ComboBox get_box() {
+		return this.box ;
+	}
+	
+	public NICBox(){
+		this.get_all_nic();
+	}
+	
+	public void get_all_nic() throws DBus.Error, GLib.Error{
+		DBus.Connection dbus_con =  DBus.Bus.get(DBus.BusType.SYSTEM);
+		dynamic DBus.Object nm = dbus_con.get_object 
+				("org.freedesktop.NetworkManager",
+				 "/org/freedesktop/NetworkManager", 
+				 "org.freedesktop.NetworkManager");
+		ObjectPath[unowned] devices_path = nm.GetDevices();
+		this.nics = new NIC[devices_path.length];
+		for (int i = 0 ; i < devices_path.length ; i++ ){
+			string path = devices_path[i];
+			dynamic DBus.Object device = dbus_con.get_object 
+				("org.freedesktop.NetworkManager",
+				 path, 
+				 "org.freedesktop.NetworkManager.Device");
+			nics[i].nic = device.Interface ;
+			nics[i].detail = nics[i].nic + get_nic_type(device) ;
+			message("find nic : %s/%s " , nics[i].nic ,nics[i].detail );
+			this.box.append_text(nics[i].detail);
+		}
+			
+	}
+	private string get_nic_type(dynamic DBus.Object device){
+		uint32 type_id = device.DeviceType ;
+		switch ( type_id ){
+			case 1: return " 有线网络接口" ; 
+			case 2: return " 无线网络接口" ; 
+			default: return " 网络接口" ; 	
+		}
+	}
+
+} 

@@ -10,7 +10,7 @@ _gen_vala(){
 		vala/RC_GTK.vala \
 		vala/RC_CLI.vala \
 		\
-		-C --thread --pkg gee-1.0 --pkg Config --pkg gmodule-2.0 --pkg gtk+-2.0  --pkg   ruijie --vapidir=./vala
+		-C --thread --pkg dbus-glib-1 --pkg gee-1.0 --pkg Config --pkg gmodule-2.0 --pkg gtk+-2.0  --pkg   ruijie --vapidir=./vala
 	mv ./vala/*.c ./src
 }
 
@@ -34,7 +34,7 @@ clean(){
 
 build(){
 	cd src
-	gcc ./*.c -o ruijieclient ` pkg-config glib-2.0 gmodule-2.0 gobject-2.0 gee-1.0 gtk+-2.0 gthread-2.0 --cflags --libs` -I. -lpcap
+	gcc ./*.c -o ruijieclient ` pkg-config dbus-glib-1 glib-2.0 gmodule-2.0 gobject-2.0 gee-1.0 gtk+-2.0 gthread-2.0 --cflags --libs` -I. -lpcap
 	cd ..
 }
 
