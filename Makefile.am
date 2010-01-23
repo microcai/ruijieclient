@@ -1,4 +1,4 @@
-SUBDIRS = packet src
+SUBDIRS = packet 
 dist_doc_DATA = README
 
 EXTRA_DIST = debian ruijieclient.spec

@@ -12,26 +12,35 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 AC_PROG_INSTALL
 
-USE_DYLIB=0
+USE_DYLIB=no
 
 AC_ARG_ENABLE(dyload,
 			[  --enable-dyload do not link to libpcap.so ,
 			                    but lookup libpcap.so when program starts],
 			[USE_DYLIB=1],
 			[USE_DYLIB=0])
-
+			
+AC_ARG_WITH([dbus],
+	[AC_HELP_STRING([--with-dbus],[use dbus to cooperate with NetworkManager and auto-auth when network cable plugin])],
+	[
+	PKG_PROG_PKG_CONFIG	
+	],[PKG_PROG_PKG_CONFIG
+	with_dbus="yes"]
+	)
+	
 AC_CHECK_LIB([pcap], [main],
 			[
 			
-			if [$USE_DYLIB=0] ; then 
+			if [ test "$USE_DYLIB"="no"] ; then 
 			  LIBS+=-lpcap
 			else
 			 CFLAGS+=" -DUSE_DYLIB "			 				
 			fi			
 			],      
             [AC_MSG_FAILURE( libpcap not found!,1)])
-
-
+if [ test "$with_dbus"="yes" ] ; then       
+PKG_CHECK_MODULES(DBUS,[dbus-glib-1])
+fi
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
