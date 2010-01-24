@@ -45,7 +45,7 @@ public class Gui : GLib.Object {
 		}
 		
 		connection.notify["state"].connect(gtk_state_change);
-		Table table = builder.get_object ("table_set") as Table;
+		/*
 		entry_nic.hide();
  			NICBox box ;
 		try{ 
@@ -54,22 +54,25 @@ public class Gui : GLib.Object {
  			message("Cann't connect to NetworkManager.");
  			entry_nic.show_all();
  		}
-		table.attach(box.get_box(),1,2,2,3,AttachOptions.FILL,AttachOptions.FILL,10,0);
-		box.get_box().show_all();
+		box.get_box().show_all();*/
 		Gtk.main ();
  	}
  	
  	Entry entry_username	;
  	Entry entry_password	;
- 	Entry entry_nic	;
+ 	NIC_Chooser nic_chooser	;
  	private void init_content(Builder builder){
  		this.entry_username = builder.get_object ("entry_username") as Entry ;
  		this.entry_password = builder.get_object ("entry_password") as Entry ;
- 		this.entry_nic	= builder.get_object ("entry_nic") as Entry ;
+ 		this.nic_chooser	= new_NIC_Chooser();
  		
  		this.entry_username.text = conf.user_name ;
  		this.entry_password.text = conf.user_password ;
- 		this.entry_nic.text	= conf.NIC ;
+ 		this.nic_chooser.set_nic	(conf.NIC) ;
+ 		
+		Table table = builder.get_object ("table_set") as Table;
+		table.attach(nic_chooser.get_widget(),1,2,2,3,AttachOptions.FILL,AttachOptions.FILL,10,0);
+ 		
  	}
  	
  	public void gtk_state_change(){
@@ -94,25 +97,93 @@ public class Gui : GLib.Object {
 	}
 }
 
-
-public class NICBox  {
+private interface NIC_Chooser : GLib.Object{
+	//public void show();
+	//public void hide();
 	
-	private ComboBox box = new ComboBox.text();
+	public signal void nic_change ();
+	
+	public abstract string get_nic();
+	
+	public abstract bool set_nic(string nic);
+	
+	public abstract Widget get_widget();
+}
+
+//caicai , do you know this is factory mode ?
+private static NIC_Chooser new_NIC_Chooser(){
+	try {
+		return new NIC_Box() ;
+	}catch (GLib.Error e){
+		return new NIC_Entry() ;
+	}
+}
+
+private class NIC_Entry : GLib.Object , NIC_Chooser {
+	private Entry entry_box ;
+	
+	public NIC_Entry() {
+		this.entry_box = new Entry();
+		this.entry_box.changed.connect(()=>{this.nic_change();});
+	}
+	
+	public string get_nic(){
+		return this.entry_box.text ;
+	}
+	
+	public bool set_nic(string nic){
+		this.entry_box.text = nic ;
+		return true ;
+	}
+	
+	public Widget get_widget(){
+		return this.entry_box ;
+	}
+
+
+}
+
+
+private class NIC_Box : GLib.Object , NIC_Chooser {
+	private ComboBox box ;
+	
+	public NIC_Box() throws DBus.Error, GLib.Error{
+		this.box = new ComboBox.text() ;
+		this.init_all_nic();
+		this.box.changed.connect(()=>{this.nic_change();});
+	}
+	
+	public string get_nic(){
+		for ( int i = 0 ; i < nics.length ; i++ ){
+				if ( i == box.get_active() ) {
+					return nics[i].nic ;
+				}
+		}
+		warning("This shoud not happen... will use eth0");
+		return "eth0" ;
+	}
+	
+	public bool set_nic(string nic){
+		for ( int i = 0 ; i < nics.length ; i++ ){
+				if ( nics[i].nic == nic ) {
+					box.set_active(i) ;
+					return true;
+				}
+		}
+		return false ;
+	}
+	
+	public Widget get_widget(){
+		return this.box ;
+	}
+	
 	struct NIC {
 		public string nic;
 		public string detail;
 	}
 	private NIC[] nics ;
 	
-	public ComboBox get_box() {
-		return this.box ;
-	}
-	
-	public NICBox(){
-		this.get_all_nic();
-	}
-	
-	public void get_all_nic() throws DBus.Error, GLib.Error{
+	public void init_all_nic() throws DBus.Error, GLib.Error{
 		DBus.Connection dbus_con =  DBus.Bus.get(DBus.BusType.SYSTEM);
 		dynamic DBus.Object nm = dbus_con.get_object 
 				("org.freedesktop.NetworkManager",
@@ -142,4 +213,5 @@ public class NICBox  {
 		}
 	}
 
-} 
+}
+

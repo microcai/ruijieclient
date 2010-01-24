@@ -66,7 +66,11 @@ public class Connection : Object {
 	}
 	public void auth(){
 		//lock(this.state){
-			Thread.create(_auth, false);
+			try {
+				Thread.create(_auth, false);
+			} catch (GLib.ThreadError e){
+				error("%s",e.message);
+			}
 		//}
 	}
 	public void* _auth() {
