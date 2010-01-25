@@ -9,6 +9,7 @@
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
+        <signal name="destroy" handler="gui_quit"/>
         <child>
           <object class="GtkHBox" id="hbox1">
             <property name="visible">True</property>
@@ -64,27 +65,30 @@
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkLabel" id="label12">
+                  <object class="GtkLabel" id="label_state">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Unknow</property>
+                    <property name="width_chars">12</property>
                   </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label13">
+                  <object class="GtkLabel" id="label_ip">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">IP address</property>
+                    <property name="width_chars">12</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label14">
+                  <object class="GtkLabel" id="label_netmask">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Net mask</property>
+                    <property name="width_chars">12</property>
                   </object>
                   <packing>
                     <property name="position">2</property>
@@ -273,13 +277,9 @@
             <property name="visible">True</property>
             <property name="spacing">13</property>
             <child>
-              <placeholder/>
-            </child>
-            <child>
               <object class="GtkButton" id="but_connect">
                 <property name="label" translatable="yes">&#x8FDE;&#x63A5;</property>
                 <property name="width_request">100</property>
-                <property name="height_request">30</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -287,30 +287,27 @@
                 <signal name="clicked" handler="gui_auth"/>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="position">1</property>
+                <property name="padding">5</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="but_logoff">
-                <property name="label" translatable="yes">&#x65AD;&#x5F00;</property>
+              <object class="GtkButton" id="but_hide">
+                <property name="label" translatable="yes">&#x9690;&#x85CF;</property>
                 <property name="width_request">100</property>
-                <property name="height_request">30</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="gui_logoff"/>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="position">2</property>
+                <property name="padding">5</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="but_exit">
                 <property name="label" translatable="yes">&#x9000;&#x51FA;</property>
                 <property name="width_request">100</property>
-                <property name="height_request">30</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -318,9 +315,8 @@
                 <signal name="clicked" handler="gui_quit"/>
               </object>
               <packing>
-                <property name="expand">False</property>
                 <property name="padding">5</property>
-                <property name="position">3</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -336,4 +332,5 @@
       </object>
     </child>
   </object>
+  <object class="GtkActionGroup" id="actiongroup1"/>
 </interface>

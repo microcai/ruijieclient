@@ -74,9 +74,11 @@ public class Connection : Object {
 		//}
 	}
 	public void* _auth() {
-			start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
-					, conf.auth_mode ,auth_callbcak,this);
-			return null;
+		stdout.printf("Use user %s for authenticate.\n", conf.user_name);
+		stdout.printf("Net interface : %s \n", conf.NIC);
+		start_auth( (char[])(conf.user_name) , (char[])(conf.user_password) , (char[])(conf.NIC) 
+				, conf.auth_mode ,auth_callbcak,this);	
+		return null;
 	}
 	public void logoff(){
 		//caicai didn't offer a good library,so we need some hack here

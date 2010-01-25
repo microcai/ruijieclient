@@ -23,7 +23,6 @@ using Config ;
  
 public int runas_cli(){
 	print_pgm_info();
-	print_auth_info();
 	connection.notify["state"].connect(cli_state_change);
 	connection.auth() ;
 	if (connection.state == State.AuthSuccessed){
@@ -53,9 +52,4 @@ public void print_pgm_info(){
 	stdout.printf("\n%s  %s \n", APP_NAME, APP_VERSION ); 
 	stdout.printf("If any problem , connect %s .\n", AUTHORS);
 	
-}
-
-public void print_auth_info(){
-	stdout.printf("Use user %s for authenticate.\n", conf.user_name);
-	stdout.printf("Net interface : %s \n", conf.NIC);
 }
