@@ -74,7 +74,10 @@ public class Gui : GLib.Object {
  	private void init_signal(){
 		connection.notify["state"].connect(state_info_update);
 		this.nic_chooser.nic_change.connect(()=>{this.label_ip.label = this.nic_chooser.get_ip();
-								this.label_netmask.label = this.nic_chooser.get_netmask();});
+								this.label_netmask.label = this.nic_chooser.get_netmask();
+								conf.NIC = this.nic_chooser.get_nic();});
+		this.entry_username.notify["text"].connect(()=>{conf.user_name = this.entry_username.text;});
+		this.entry_password.notify["text"].connect(()=>{conf.user_password = this.entry_password.text;});
  	}
  	public void state_info_update(){
  		stdout.printf("state:%i\n",connection.state);

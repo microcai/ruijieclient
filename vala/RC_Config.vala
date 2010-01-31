@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
+using Config;
 
  
 public class RC_Config : Object {
@@ -38,15 +39,31 @@ public class RC_Config : Object {
 	public string conf_file_path = "/etc/ruijie.conf" ;
 
 	public RC_Config () {
+		this.load_from_file(Config.CONF_PATH );
 		this.notify["echo-interval"].connect((s, p) => {connection.load_echo();});
 	}
 	
+	KeyFile file ;
 	public void load_from_file(string path){
-		message("load_from_file still not work now");
+		string group = "ruijieclient";
+		try{
+			this.file = new GLib.KeyFile();
+			this.file.load_from_file(path,KeyFileFlags.NONE);
+			this.user_name = file.get_string(group,"UserName");
+			this.user_password = file.get_string(group,"UserPassword");
+			this.NIC= file.get_string(group,"NIC");
+		} catch (GLib.Error e){
+			warning("Config file doesn't fit.");
+			this.gen_new_config_file(path);
+			//some work
+		}
 	}
 	public void save_to_file(string path){
 		message("save_to_file still not work now");
 	
+	}
+	public void gen_new_config_file(string path){
+		message("gen_new_config_file still not work now");
 	}
 }
 

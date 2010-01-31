@@ -27,6 +27,7 @@ namespace Config
 	public const string LOCALE_DIR;
 	public const string APP_VERSION;
 	public const string LOGO_PATH;
+	public const string CONF_PATH;
 	public const string AUTHORS;
 }
 
