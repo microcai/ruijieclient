@@ -247,7 +247,14 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkLabel" id="label12">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">http://ruijieclient.googlecode.com
+</property>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>
@@ -284,7 +291,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="resize_mode">immediate</property>
-                <signal name="clicked" handler="gui_auth"/>
+                <signal name="clicked" handler="gui_click_auth_button"/>
               </object>
               <packing>
                 <property name="padding">5</property>
@@ -311,7 +318,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="yalign">0.52999997138977051</property>
                 <signal name="clicked" handler="gui_quit"/>
               </object>
               <packing>

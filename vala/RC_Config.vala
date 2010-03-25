@@ -41,26 +41,39 @@ public class RC_Config : Object {
 	public RC_Config () {
 		this.load_from_file(Config.CONF_PATH );
 		this.notify["echo-interval"].connect((s, p) => {connection.load_echo();});
+		this.notify["user_name"].connect((s, p)=>{keyfile.set_string(group,"UserName",this.user_name);});
+		this.notify["user_password"].connect((s, p)=>{keyfile.set_string(group,"UserPassword",this.user_password);});
+		this.notify["NIC"].connect((s, p)=>{message("csd");keyfile.set_string(group,"NIC",this.NIC);});
 	}
 	
-	KeyFile file ;
+	File file ;
+	KeyFile keyfile ;
+	string group = "ruijieclient";
 	public void load_from_file(string path){
-		string group = "ruijieclient";
 		try{
-			this.file = new GLib.KeyFile();
-			this.file.load_from_file(path,KeyFileFlags.NONE);
-			this.user_name = file.get_string(group,"UserName");
-			this.user_password = file.get_string(group,"UserPassword");
-			this.NIC= file.get_string(group,"NIC");
+			this.file = File.new_for_path (path);
+			
+			this.keyfile = new GLib.KeyFile();
+			this.keyfile.load_from_file(path,KeyFileFlags.NONE);
+			
+			this.user_name = keyfile.get_string(group,"UserName");
+			this.user_password = keyfile.get_string(group,"UserPassword");
+			this.NIC= keyfile.get_string(group,"NIC");
 		} catch (GLib.Error e){
 			warning("Config file doesn't fit.");
 			this.gen_new_config_file(path);
 			//some work
 		}
 	}
-	public void save_to_file(string path){
-		message("save_to_file still not work now");
-	
+	public void save_to_file(){
+		string config = keyfile.to_data();
+		message(config);
+		return ;
+		/*file.delete(null);
+		var file_stream = this.file.create(GLib.FileCreateFlags.REPLACE_DESTINATION, null);
+		var data_stream = new DataOutputStream (file_stream);
+		data_stream.put_string (config, null);
+		message("still some work");*/
 	}
 	public void gen_new_config_file(string path){
 		message("gen_new_config_file still not work now");

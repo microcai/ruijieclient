@@ -43,8 +43,8 @@ public class Gui : GLib.Object {
 			//TODO
 			return ;
 		}
-		init_signal();
 		init_content();
+		init_signal();
 		Gtk.main ();
  	}
  	
@@ -54,6 +54,7 @@ public class Gui : GLib.Object {
  	Label label_state		;
  	Label label_ip		;
  	Label label_netmask	;
+ 	Button but_connect	;
  	private void init_widget(Builder builder){
  		this.entry_username = builder.get_object ("entry_username") as Entry ;
  		this.entry_password = builder.get_object ("entry_password") as Entry ;
@@ -61,6 +62,7 @@ public class Gui : GLib.Object {
  		this.label_state	= builder.get_object ("label_state") as Label ;
  		this.label_ip	= builder.get_object ("label_ip") as Label ;
  		this.label_netmask	= builder.get_object ("label_netmask") as Label ;
+ 		this.but_connect	= builder.get_object ("but_connect") as Button;
  		
 		Table table = builder.get_object ("table_set") as Table;
 		table.attach(nic_chooser.get_widget(),1,2,2,3,AttachOptions.FILL,AttachOptions.FILL,10,0);
@@ -85,46 +87,69 @@ public class Gui : GLib.Object {
 			case State.Authing_Search_Server :
 				stdout.printf("Searching for server ...\n "); 
 				this.label_state.label = "搜索服务器... ";
+				this.but_connect.label = "取消";
 				break;
 			case State.Authing_Sending_UserName :
 				stdout.printf("Server Found . Now sending user name ... \n")  ; 
 				this.label_state.label = "发送认证信息... ";
+				this.but_connect.label = "取消";
 				break;
 			case State.Authing_Sending_Password :
 				stdout.printf("Sending password ... \n")  ; 
 				this.label_state.label = "发送认证信息... ";;
+				this.but_connect.label = "取消";
 				break;
 			case State.AuthSuccessed :
 				stdout.printf("Authenticate success.\n")  ; 
 				this.label_state.label = "认证成功 ";
+				this.but_connect.label = "断开";
 				break;
 			case State.AuthFailed :
 				stdout.printf("Authenticate FAILED \n")  ; 
 				this.label_state.label = "认证失败 ";
+				this.but_connect.label = "连接";
 				break;
 			default: 
 				this.label_state.label = "Unknow";
+				this.but_connect.label = "连接";
 				break;
 		}
  	}
  	
+	[CCode (instance_pos = -1)]
+ 	public void click_auth_button(Button source){
+ 		if ( connection.state == State.Authing_Search_Server ||
+ 				connection.state == State.Authing_Sending_UserName ||
+ 				connection.state == State.Authing_Sending_Password ||
+ 				connection.state == State.Authing_done ){
+ 			
+ 		}
+ 		if ( connection.state == State.Unknow ||
+ 				connection.state == State.AuthFailed ){
+ 			this.auth();
+ 		}
+ 		if ( connection.state == State.AuthSuccessed ){
+ 			this.logoff();
+ 		}
+ 		
+ 	}
  	
 	[CCode (instance_pos = -1)]
 	public void quit(Button source){
 		//connection.logoff();
+		conf.save_to_file();
 		Gtk.main_quit();
 	}
 	
-	[CCode (instance_pos = -1)]
-	public void auth(Button sourve){
+	public void auth(){
 		connection.auth() ;
 	}
 	
-	[CCode (instance_pos = -1)]
-	public void logoff(Button source){
+	public void logoff(){
 		connection.logoff();
 	}
 }
+ 
 
 private interface NIC_Chooser : GLib.Object{
 	//public void show();
@@ -276,9 +301,11 @@ private class NIC_Box : GLib.Object , NIC_Chooser {
 		if ( this.device == null ){
 			return "不可用";
 		}
-		/* seems to be a vala bug?
-		//try {
-			string ip4conf_path = (owned) this.device.Ip4Config ;
+		//seems to be a vala bug?
+		try {
+			message("a");
+			ObjectPath ip4conf_path = this.device.Ip4Config ;
+			message("b");
 			if ( ip4conf_path == "/" ){
 				return "尚未配置" ;
 			}
@@ -286,14 +313,17 @@ private class NIC_Box : GLib.Object , NIC_Chooser {
 				("org.freedesktop.NetworkManager",
 				 ip4conf_path, 
 				 "org.freedesktop.NetworkManager.IP4Config");
-			//uint32[][] add = ip4conf.Addresses ;
+			//uint32[,] add = new uint32[3,3]; 
+			uint32[unowned] add = ip4conf.nameserversnew ;//int[3][3];
+			//ip4conf.nameservers ;
+			//
 			//uint32 ip_i = add[0][1];
-			//message("IP_i:%u",ip_i);
-		//}catch (DBus.Error e){
+			//message("IP_i:%u",add);
+		}catch (DBus.Error e){
+			message("error!");
+		}
 		
-		//}
-		*/
-		return "不可用";
+		return "不可用~";
 	}
 	public string get_netmask(){
 		return "不可用";
