@@ -302,8 +302,8 @@ Gensetting(struct cfg_tags * t)
   int rc;
   char name[200];
   fprintf(stderr,"Please input UserName:");
-  scanf("%s\n",name);
-  t[USERNAME].val = name;
+  if(scanf("%s\n",name)==1)
+	  t[USERNAME].val = name;
   t[PASSWORD].val = getpass("Please input Password:");
 
 #ifdef HAVE_LIBXML2

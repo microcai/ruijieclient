@@ -77,7 +77,7 @@ int pkt_build_ethernet(u_char*dest,u_char*src,uint16_t protocol);
 int pkt_write_link();
 int pkt_read_link(const u_char**packet);
 int pkt_close();
-
+char* pkt_lasterr();
 
 #endif /* PACKETSENDER_H_ */
 
