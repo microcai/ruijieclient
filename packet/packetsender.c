@@ -30,7 +30,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#ifdef OS_LINUX
 #include <net/if.h>
+#endif
 #include <ifaddrs.h>
 #include <netinet/in.h>
 #include <pcap/pcap.h>
