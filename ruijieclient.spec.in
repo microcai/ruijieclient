@@ -1,8 +1,8 @@
 %define build_number 1
 %define debug_package %{nil}
 
-Name:      ruijieclient
-Version:   0.8.1
+Name:      @PACKAGE_NAME@
+Version:   @PACKAGE_VERSION@
 Release:   %{build_number}%{?dist}
 Summary:   a ruijie network supplicant for GNU/Linux
 
@@ -12,8 +12,8 @@ URL:       http://code.google.com/p/ruijieclient/
 Source0:   http://ruijieclient.googlecode.com/files/ruijieclient-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}_%{version}-%{release}-root_%(%{__id_u} -n)
 
-BuildRequires: libpcap-devel glibc-devel libxml2-devel
-Requires: libpcap glibc kernel libxml2
+BuildRequires: libpcap-devel glibc-devel
+Requires: libpcap glibc
 
 %description
 RuijieClient is a ruijie network supplicant for GNU/Linux  which is based on mystar, but re-writed form scratch.
@@ -47,6 +47,8 @@ update-desktop-database %{_datadir}/applications &>/dev/null || :
 %{_docdir}/ruijieclient/README
 
 %changelog
+* Mon Oct 25 13:03:17 UTC 2010 microcai
+	make it .in instead of raw .spec
 
 * Sat Jun 13 2009 Gong Han <gong@fedoraproject.org> - 0.8-1
 - Creat a spec file

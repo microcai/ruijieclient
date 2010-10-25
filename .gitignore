@@ -12,3 +12,4 @@ install-sh
 Makefile
 stamp-h1
 ruijieclient
+*.spec

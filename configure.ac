@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([ruijieclient], [0.8.3], [gong@fedoraproject.org])
+AC_INIT([ruijieclient], [0.8.3], [microcai@fedoraproject.org])
 
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_CONFIG_SRCDIR([config.h.in])
@@ -29,12 +29,19 @@ AS_IF( [ test "x$with_dyload" = "xyes"  ],[
 	AC_DEFINE(USE_DYLIBPCAP,1,[Use dlopen to load libpcap])	
 ])
 
+AC_CHECK_HEADER([pcap/pcap.h],[],[AC_MSG_FAILURE([pcap.h not found!],1)])
+
 AC_CHECK_LIB(pcap,pcap_close,
 		[
-			AS_IF( [ test "x$with_dyload" != "xyes"  ],[LIBS+="-lpcap"],)
+			AS_IF( [ test "x$with_dyload" != "xyes"  ],[LIBS+="-lpcap"])
 		],
 		[
 			AS_IF( [ test "x$with_dyload" != "xyes"  ], [ AC_MSG_FAILURE([libpcap-dev no found],[1]) ])
+		])
+
+AS_IF( [ test "x$with_dyload" = "xyes"  ],
+		[
+			AC_CHECK_LIB(dl,dlopen,[],[AC_MSG_FAILURE(dyload need libdl)])
 		])
 
 AC_C_BIGENDIAN()
@@ -55,10 +62,9 @@ AC_CHECK_HEADERS([linux/rtnetlink.h],[],[],
 	]])
 AC_CHECK_HEADERS([linux/rtnetlink.h])
 # Checks for libraries.
-
-AC_CHECK_HEADER([pcap/pcap.h],[],[AC_MSG_FAILURE([pcap.h not found!],1)])
 	
 AC_CONFIG_FILES([Makefile
 				 packet/Makefile
-				 src/Makefile])
+				 src/Makefile
+				 ruijieclient.spec])
 AC_OUTPUT
