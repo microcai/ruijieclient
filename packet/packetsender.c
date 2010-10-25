@@ -239,14 +239,14 @@ int pkt_get_param(int what, struct sockaddr * sa_data)
 				}
 			}
 			freeifaddrs(pifaddrs);
-#ifndef OS_BSD
+#ifdef OS_LINUX
 			struct ifreq rif;
 			memset(&rif,0,sizeof(rif));
 			strcpy(rif.ifr_name,nic_name);
 
 			int sock = socket(AF_INET,SOCK_DGRAM|SOCK_CLOEXEC,0);
 			ioctl(sock, SIOCGIFHWADDR, &rif);
-			memcpy(nic_hwaddr,rif.ifr_ifru.ifru_hwaddr.sa_data,6);
+			memcpy(nic_hwaddr,rif.ifr_hwaddr.sa_data,6);
 			close(sock);
 #endif
 		}
