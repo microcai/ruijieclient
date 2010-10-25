@@ -53,7 +53,8 @@ AC_CHECK_HEADER([netinet/in.h])
 AC_CHECK_DECL([INET_ADDRSTRLEN],[],[AC_DEFINE([INET_ADDRSTRLEN],[16],[sizeof(sockaddr_in)])],
 				[[ #include <netinet/in.h>
 				]])
-				
+			
+	
 AC_CHECK_DECL(SIOCGIFHWADDR,[AC_DEFINE(OS_LINUX,1,[defined if os is Linux])],
 		[	AC_DEFINE(OS_BSD,1,[defined is os is bsd])
 		],
@@ -65,7 +66,12 @@ AC_CHECK_DECL(SIOCGIFHWADDR,[AC_DEFINE(OS_LINUX,1,[defined if os is Linux])],
 			#include <ifaddrs.h>			
 		]])
 		
-AC_CHECK_HEADER([net/if_dl.h],[AC_DEFINE(OS_BSD,1,[defined is os is bsd])])						
+AC_CHECK_HEADER([net/if_dl.h],[
+	AC_DEFINE(OS_BSD,1,[defined is os is bsd])
+		AC_CHECK_DECL([IFF_LOOPBACK],[],[AC_DEFINE([IFF_LOOPBACK],[8],[defined as 8])],
+				[[ #include <net/if_dl.h>
+				]])	
+	])						
 
 AC_CHECK_HEADERS([iconv.h  arpa/inet.h stdlib.h string.h sys/socket.h sys/time.h unistd.h net/ethernet.h])
 

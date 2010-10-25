@@ -231,7 +231,7 @@ int pkt_get_param(int what, struct sockaddr * sa_data)
 							break;
 #ifdef OS_BSD
 						case AF_LINK:
-		                    sdl = (struct sockaddr_dl *)ifap->ifa_addr;
+		                    sdl = (struct sockaddr_dl *)pifaddr->ifa_addr;
 		                        /* I was returning this from a function before converting
 		                         * this snippet, which is why I make a copy here on the heap */
 		                    memcpy(nic_hwaddr, LLADDR(sdl), sdl->sdl_alen);
