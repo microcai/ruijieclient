@@ -95,9 +95,7 @@ Ping(in_addr_t host_addr)
     case 1:
 #ifdef DEBUG
       {
-        struct in_addr ip;
-        ip.s_addr = host_addr;
-        fprintf(stdout,"##ping %s alive\n",inet_ntoa(ip));
+        fprintf(stdout,"##ping %s alive\n",inet_ntoa((struct in_addr){host_addr}));
       }
 #endif
       close(sk);
