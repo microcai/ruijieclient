@@ -63,7 +63,9 @@ AC_CHECK_DECL(SIOCGIFHWADDR,[AC_DEFINE(OS_LINUX,1,[defined if os is Linux])],
 			#include <unistd.h>
 			#include <net/if.h>
 			#include <ifaddrs.h>			
-		]])				
+		]])
+		
+AC_CHECK_HEADER([net/if_dl.h],[AC_DEFINE(OS_BSD,1,[defined is os is bsd])])						
 
 AC_CHECK_HEADERS([iconv.h  arpa/inet.h stdlib.h string.h sys/socket.h sys/time.h unistd.h net/ethernet.h])
 
