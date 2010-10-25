@@ -30,9 +30,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <net/if.h>
+//#include <net/if_>
+#include <net/if_packet.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
-#include <net/if.h>
 #include <pcap/pcap.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -74,7 +76,7 @@ static pcap_t * pcap_handle;
 static char pcap_errbuf[PCAP_ERRBUF_SIZE];
 static in_addr_t nic_ip, nic_mask;
 static char nic_name[PCAP_ERRBUF_SIZE];
-static char nic_hwaddr[6];
+static unsigned char nic_hwaddr[6];
 static char pkt_buffer[ETH_MTU];
 static int pkt_length;
 static char pkt_errbuff[PCAP_ERRBUF_SIZE];
@@ -91,12 +93,12 @@ int open_lib()
 #ifndef USE_DYLIBPCAP
 	return 0;
 #else
-	char libpcap[4][32]=
+	char *libpcap[]=
 	{
-		{	"libpcap.so.1"},
-		{	"libpcap.so.0.9"},
-		{	"libpcap.so.0.8"},
-		{	"libpcap.so.0.7"},
+		"libpcap.so.1",
+		"libpcap.so.0.9",
+		"libpcap.so.0.8",
+		"libpcap.so.0.7",
 	};
 	void *plibpcap;
 	int index = 0;
@@ -184,11 +186,11 @@ int pkt_open_link(const char * _nic_name)
 		return -1;
 	}
 	struct sockaddr	soaddr;
-	pkt_get_param(SIOCGIFHWADDR,&soaddr);
+	pkt_get_param(PKT_PG_HWADDR,&soaddr);
 
 	snprintf(filter_buf, sizeof(filter_buf), FILTER_STR, nic_hwaddr[0],
-			nic_hwaddr[0], nic_hwaddr[0], nic_hwaddr[0], nic_hwaddr[0],
-			nic_hwaddr[0]);
+			nic_hwaddr[1], nic_hwaddr[2], nic_hwaddr[3], nic_hwaddr[4],
+			nic_hwaddr[5]);
 
 	if (pcap_compile(pcap_handle, &filter_code, filter_buf, 0, nic_mask) == -1)
 	{
@@ -210,61 +212,55 @@ int pkt_open_link(const char * _nic_name)
 int pkt_get_param(int what, struct sockaddr * sa_data)
 {
 	static int initialized = 0;
-#ifdef HAVE_NET_IF_DL_H
 	struct ifaddrs * pifaddrs, *pifaddr;
-#else
-	struct ifreq rif;
-#endif
+    struct sockaddr_dl *sdl = NULL;
+
 
 	if (!initialized)
 	{
-#ifndef SIOCGIFHWADDR
 		if (!getifaddrs(&pifaddrs))
 		{
 			for (pifaddr = pifaddrs; pifaddr; pifaddr = pifaddr->ifa_next)
 			{
 				if (pifaddr->ifa_name && pifaddr->ifa_name[0] && !strcmp(
-								(const char*) pifaddr->ifa_name, nic_name))
+						(const char*) pifaddr->ifa_name, nic_name))
 				{
-					nic_ip = ((struct sockaddr_in*) pifaddr->ifa_addr)->sin_addr.s_addr;
-					nic_mask = ((struct sockaddr_in*) pifaddr->ifa_netmask)->sin_addr.s_addr;
-
-					const struct sockaddr_dl * sdl = (struct sockaddr_dl*) pifaddr->ifa_addr;
-					memcpy(nic_hwaddr, sdl->sdl_data + sdl->sdl_nlen, 6);
-					break;
+					switch(pifaddr->ifa_addr->sa_family)
+					{
+						case AF_INET:
+							nic_ip 	= ((struct sockaddr_in*) pifaddr->ifa_addr)->sin_addr.s_addr;
+							if(pifaddr->ifa_netmask)
+								nic_mask= ((struct sockaddr_in*) pifaddr->ifa_netmask)->sin_addr.s_addr;
+							break;
+#ifdef _OS_BSD_
+						case AF_LINK:
+		                    sdl = (struct sockaddr_dl *)ifap->ifa_addr;
+		                        /* I was returning this from a function before converting
+		                         * this snippet, which is why I make a copy here on the heap */
+		                    memcpy(nic_hwaddr, LLADDR(sdl), sdl->sdl_alen);
+							break;
+#endif
+					}
 				}
 			}
 			freeifaddrs(pifaddrs);
-		}
-		else
-		{
-			snprintf(pkt_errbuff,sizeof(pkt_errbuff),"cannot get nic:%s paramters",nic_name);
-			return -1;
-		}
-#else
-		int sock = socket(AF_INET, SOCK_DGRAM, 0);
+#ifndef _OS_BSD_
+			struct ifreq rif;
+			memset(&rif,0,sizeof(rif));
+			strcpy(rif.ifr_name,nic_name);
 
-		if (!ioctl(sock, SIOCGIFHWADDR, &rif))
-		{
-			memcpy(nic_hwaddr, rif.ifr_hwaddr.sa_data, 6);
+			int sock = socket(AF_INET,SOCK_DGRAM|SOCK_CLOEXEC,0);
+			ioctl(sock, SIOCGIFHWADDR, &rif);
+			memcpy(nic_hwaddr,rif.ifr_ifru.ifru_hwaddr.sa_data,6);
+			close(sock);
+#endif
 		}
 		else
 		{
 			snprintf(pkt_errbuff, sizeof(pkt_errbuff),
-					"Err getting %s address\n", nic_name);
-			close(sock);
+					"cannot get nic:%s paramters", nic_name);
 			return -1;
 		}
-
-		if (!ioctl(sock, SIOCGIFADDR, &rif))
-			memcpy(&nic_ip, rif.ifr_addr.sa_data + 2, 4);
-
-		if (!ioctl(sock, SIOCGIFNETMASK, &rif))
-			memcpy(&nic_mask, rif.ifr_addr.sa_data + 2, 4);
-		else
-			nic_mask = inet_addr("255.255.255.0");
-		close(sock);
-#endif
 	}
 
 	((struct sockaddr_in*) sa_data)->sin_family = PF_INET;

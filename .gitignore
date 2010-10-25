@@ -1,0 +1,14 @@
+.*
+*.[oa]
+missing
+depcomp
+Makefile.*
+!Makefile.am
+build/
+config*
+aclocal.m4
+autom4te.cache/
+install-sh
+Makefile
+stamp-h1
+ruijieclient

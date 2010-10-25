@@ -98,7 +98,6 @@ typedef struct __ruijie_packet
   in_addr_t m_gate; //Default gateway
   in_addr_t m_dns;
   in_addr_t m_pinghost;
-  int   m_nocofigfile; // 1 if we should not read from config file
 
 } ruijie_packet;
 

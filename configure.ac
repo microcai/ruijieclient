@@ -56,19 +56,8 @@ AC_CHECK_HEADERS([linux/rtnetlink.h])
 # Checks for libraries.
 
 AC_CHECK_HEADER([pcap/pcap.h],[],[AC_MSG_FAILURE([pcap.h not found!],1)])
-			
-# important ! here we just determin where the user have got libxml2-devel installed
-
-AC_CHECK_LIB(xml2, [main],[],[AC_WARN(libxml2 not found! xml feature will not work!)])
-	
-AC_SUBST(XML_INCLUDE,/usr/include/libxml2) 
-	
-AC_SUBST_FILE(XML_INCLUDE)
-
-# Checks for header files.
-
 	
 AC_CONFIG_FILES([Makefile
 				 packet/Makefile
-                 src/Makefile])
+				 src/Makefile])
 AC_OUTPUT

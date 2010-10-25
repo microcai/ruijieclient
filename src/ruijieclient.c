@@ -65,18 +65,6 @@ check_as_root()
 #endif
 }
 
-
-/*Get config*/
-void
-GetConfig(ruijie_packet * l);
-/*generate default settings */
-void
-GenSetting();
-
-// this is a top crucial change that eliminated all global variables
-static ruijie_packet sender =
-  { 0 };
-
 /* cleanup on exit when detected Ctrl+C */
 static void
 logoff(int signo)
@@ -85,7 +73,9 @@ logoff(int signo)
   _exit(0);
 }
 
-// return 0 will abort the auth engine
+static ruijie_packet sender = { 0 };
+
+// return 1 will abort the auth engine
 static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 {
   switch(reason)
@@ -118,6 +108,8 @@ int start_dhcp()
 int
 main(int argc, char* argv[])
 {
+  // this is a top crucial change that eliminated all global variables
+
   /* message buffer define*/
   // utf-8 msg buf. note that each utf-8 character takes 4 bytes
   char u_msgBuf[MAX_U_MSG_LEN];
@@ -143,12 +135,10 @@ main(int argc, char* argv[])
     {"--dhcpmode",(char*)&sender.m_dhcpmode,"    --dhcpmode=? dhcpmode, default is 0\n\t\t 0:disable\n\t\t 1:DHCP before auth\n\t\t 2:DHCP after auth,\n\t\t 3:dhcp-authenticate and re-authenticate after DHCP",sizeof(sender.m_dhcpmode),10,INTEGER},
     {"-f",config_file,0,sizeof(config_file),2,STRING},
     {"--config",config_file," -f,--config\t specify alternative config file",sizeof(config_file),8,STRING},
-    {"-g", (char*)&genfile ," -g\t\t generate a sample configuration automatically",sizeof(genfile),2, BOOL_both},
     {"-K", (char*)&kill_ruijieclient ," -k,-K\t\t kill all RuijieClient daemon",sizeof(kill_ruijieclient),2, BOOL_both},
     {"-k", (char*)&kill_ruijieclient ,0,sizeof(kill_ruijieclient),2, BOOL_both},
     {"-n", sender.m_nic ,0,sizeof(sender.m_nic),2, STRING},
     {"--nic", sender.m_nic ," -n,--nic\t specify an identifier of net adapter",sizeof(sender.m_nic),5, STRING},
-    {"--noconfig",(char*)&(sender.m_nocofigfile),"    --noconfig\t do not read config from file",sizeof(sender.m_nocofigfile),10,BOOL_both},
     {"-p",sender.m_password ,0,sizeof(sender.m_password),2,STRING},
     {"--passwd",sender.m_password," -p,--passwd\t specify password",sizeof(sender.m_password),6,STRING},
     {"--pinghost",pinghost,"    --pinghost\t the host to be pinged(by default is your default gateway)\n\t\t RuijieClient uses this to detect network state",sizeof(pinghost),10,STRING},
@@ -165,13 +155,6 @@ main(int argc, char* argv[])
   if (showversion)
     err_quit("%s", PACKAGE_VERSION);
 
-  // if '-g' is passed as argument then generate a sample configuration
-  if (genfile)
-    {
-      check_as_root();
-      GenSetting();
-      exit(EXIT_SUCCESS);
-    }
   //if '-k,K' is passed as argument then kill all other ruijieclients which are running
   if (kill_ruijieclient)
     {
@@ -181,11 +164,6 @@ main(int argc, char* argv[])
       exit(EXIT_SUCCESS);
     }
 
-  if (!sender.m_nocofigfile)
-    {
-      check_as_root();
-      GetConfig(&sender);
-    }
   if (pinghost[0])
     sender.m_pinghost = inet_addr(pinghost);
 
@@ -207,9 +185,6 @@ main(int argc, char* argv[])
   signal(SIGTERM, logoff);
   signal(SIGSTOP, logoff);
   signal(SIGTSTP, logoff);
-
-  if (sender.m_nocofigfile)
-    check_as_root();
 
   //print copyright and bug report message
   printf("\n\n%s - a powerful ruijie Supplicant for UNIX, base on mystar.\n"
