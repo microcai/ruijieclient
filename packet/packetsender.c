@@ -31,8 +31,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <net/if.h>
-//#include <net/if_>
-#include <net/if_packet.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
 #include <pcap/pcap.h>
@@ -40,12 +38,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#ifdef HAVE_NET_IF_DL_H
+#ifndef OS_LINUX
 #include <sys/param.h>
 #include <net/if_dl.h>
-#define _OS_BSD_ BSD
-#else
-
 #endif
 
 #include "packetsender.h"
@@ -232,7 +227,7 @@ int pkt_get_param(int what, struct sockaddr * sa_data)
 							if(pifaddr->ifa_netmask)
 								nic_mask= ((struct sockaddr_in*) pifaddr->ifa_netmask)->sin_addr.s_addr;
 							break;
-#ifdef _OS_BSD_
+#ifndef OS_LINUX
 						case AF_LINK:
 		                    sdl = (struct sockaddr_dl *)ifap->ifa_addr;
 		                        /* I was returning this from a function before converting
@@ -244,7 +239,7 @@ int pkt_get_param(int what, struct sockaddr * sa_data)
 				}
 			}
 			freeifaddrs(pifaddrs);
-#ifndef _OS_BSD_
+#ifdef OS_LINUX
 			struct ifreq rif;
 			memset(&rif,0,sizeof(rif));
 			strcpy(rif.ifr_name,nic_name);
