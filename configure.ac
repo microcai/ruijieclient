@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([ruijieclient], [0.8.2], [gong@fedoraproject.org])
+AC_INIT([ruijieclient], [0.8.3], [gong@fedoraproject.org])
 
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_CONFIG_SRCDIR([config.h.in])
@@ -20,8 +20,9 @@ AC_ARG_ENABLE(debug,
               )
 
 AC_ARG_ENABLE(dyload,
-			[AC_HELP_STRING([--enable-dyload],
-			[do not link to libpcap.so , but lookup libpcap.so when program starts])],[],
+			[AC_HELP_STRING([--diable-dyload],
+			[link to libpcap.so instead of lookup libpcap.so when program starts])],
+			[with_dyload=$enableval],
 			[with_dyload=yes])
 
 AS_IF( [ test "x$with_dyload" = "xyes"  ],[
@@ -30,10 +31,10 @@ AS_IF( [ test "x$with_dyload" = "xyes"  ],[
 
 AC_CHECK_LIB(pcap,pcap_close,
 		[
-			AS_IF( [ test "x$with_dyload" = "xno"  ],[LIBS+= -lpcap],)
+			AS_IF( [ test "x$with_dyload" != "xyes"  ],[LIBS+="-lpcap"],)
 		],
 		[
-			AS_IF( [ test "x$with_dyload" = "xno"  ], [ AC_MSG_FAILURE([libpcap-dev no found],[1]) ])
+			AS_IF( [ test "x$with_dyload" != "xyes"  ], [ AC_MSG_FAILURE([libpcap-dev no found],[1]) ])
 		])
 
 AC_C_BIGENDIAN()

@@ -39,8 +39,6 @@
 
 // flag of afterward DHCP status
 
-char config_file[256] = "/etc/ruijie.conf";
-
 /* These info should be worked out by initialisation portion. */
 
 /* Authenticate Status
@@ -120,7 +118,6 @@ main(int argc, char* argv[])
   int noip_afterauth = 1;
   long setdaemon = 0;
   long nodaemon = 0;
-  long genfile = 0;
   long kill_ruijieclient = 0;
   long flag_nokill = 0;
   int try_time = 5;
@@ -133,8 +130,6 @@ main(int argc, char* argv[])
     {"-D", (char*)&nodaemon," -D\t\t DO NOT fork as a deamon",sizeof(nodaemon),2, BOOL_both},
     {"--daemon", (char*)&setdaemon,"    --daemon\t run as a daemon(default)",sizeof(setdaemon),8, BOOL_both},
     {"--dhcpmode",(char*)&sender.m_dhcpmode,"    --dhcpmode=? dhcpmode, default is 0\n\t\t 0:disable\n\t\t 1:DHCP before auth\n\t\t 2:DHCP after auth,\n\t\t 3:dhcp-authenticate and re-authenticate after DHCP",sizeof(sender.m_dhcpmode),10,INTEGER},
-    {"-f",config_file,0,sizeof(config_file),2,STRING},
-    {"--config",config_file," -f,--config\t specify alternative config file",sizeof(config_file),8,STRING},
     {"-K", (char*)&kill_ruijieclient ," -k,-K\t\t kill all RuijieClient daemon",sizeof(kill_ruijieclient),2, BOOL_both},
     {"-k", (char*)&kill_ruijieclient ,0,sizeof(kill_ruijieclient),2, BOOL_both},
     {"-n", sender.m_nic ,0,sizeof(sender.m_nic),2, STRING},
