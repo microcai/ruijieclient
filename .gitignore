@@ -13,3 +13,4 @@ Makefile
 stamp-h1
 ruijieclient
 *.spec
+dumped/

@@ -40,6 +40,7 @@
 #define RJ_PKT_STOP  02
 
 #define EAP_FAILED		1
+#define EAP_REQUEST		1
 #define EAP_RESPONSE    2
 #define EAP_SUCCESS     3
 
@@ -51,6 +52,8 @@
  */
 enum ruijie_auth_callback_reason
 {
+  RUIJIE_AUTH_SUCCESS = 0,
+  /**<服务器通过认证*/
 
   RUIJIE_AUTH_FINDSERVER = 1,
   /**< 在查找服务器。返回-1停止查找。结束认证*/
@@ -60,8 +63,7 @@ enum ruijie_auth_callback_reason
 
   RUIJIE_AUTH_NEEDPASSWD = 3,
   /**<服务器需要密码*/
-  RUIJIE_AUTH_SUCCESS = 0,
-  /**<服务器通过认证*/
+
   RUIJIE_AUTH_FAILED = 4,
   /**<服务器拒绝认证*/
 };

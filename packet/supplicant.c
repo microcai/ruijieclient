@@ -141,6 +141,7 @@ static uint32_t         ruijie_Echo_Key;
 static uint32_t         ruijie_Echo_Diff;
 static const u_char* 	ruijie_recv;
 
+//TODO:根据version来启用V3校验
 static int gen_ruijie_private_packet(int mode,char*version)
 {
   int iCircle = 0x15;
@@ -256,14 +257,14 @@ static int ruijie_start(int broadcastmethod)
 
   pkt_build_start();
   pkt_build_ruijie(sizeof(ruijie_privatedata),ruijie_privatedata);
-  pkt_build_8021x(1,EAP_START,4,0,0);
+  pkt_build_8021x(1,EAP_START,0,0,0);
   pkt_build_ethernet(broadcast[broadcastmethod?1:0],0,ETH_PROTO_8021X);
   return pkt_write_link();
 }
 
 static int ruijie_ack_name(int id,char*name)
 {
-  char          payload[128];
+  char          payload[128]={0};
   int           payload_len;
   payload[127] = 0;
   payload[0] = 1; // EAP type
@@ -272,9 +273,9 @@ static int ruijie_ack_name(int id,char*name)
   pkt_build_start();
 
   pkt_build_ruijie(sizeof(ruijie_privatedata),ruijie_privatedata);
-  strncpy(payload + 1, name, 128);
+  strncpy(payload +1 , name, payload_len);
   pkt_build_8021x_ext(EAP_RESPONSE,id,payload_len,payload);
-  pkt_build_8021x(1,1,payload_len+4,0,0);
+  pkt_build_8021x(1,0,payload_len+4,0,0);
   pkt_build_ethernet(ruijie_dest,0,ETH_PROTO_8021X);
   return pkt_write_link();
 }
@@ -306,7 +307,7 @@ static int ruijie_ack_password(int id,char*name,char*passwd,const u_char* MD5val
   memcpy(EAP_EXTRA+2,md5Dig,16); // md5 encrypt passwd
   strcpy(EAP_EXTRA+18,name);//user name
   pkt_build_8021x_ext(EAP_RESPONSE,id,22+strlen(name),EAP_EXTRA);
-  pkt_build_8021x(1,0,22+strlen(name),0,0);
+  pkt_build_8021x(1,0,26+strlen(name),0,0);
   pkt_build_ethernet(ruijie_dest,0,ETH_PROTO_8021X);
   return pkt_write_link();
 }
@@ -408,14 +409,14 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
 
   do
     {
-      while (!pkt_read_link(&ruijie_recv) && ruijie_recv )
+      while (pkt_read_link(&ruijie_recv)==1 && ruijie_recv )
         {
           switch ( ruijie_recv[0x12])
             {
-          case EAP_FAILED:
+          case EAP_FAILED+3:
         	authprogress(RUIJIE_AUTH_FAILED,ruijie_recv,userptr);
         	break;
-          case EAP_RESPONSE:
+          case EAP_REQUEST:
             switch (ruijie_recv[0x16])
               {
             case 1: //Type: Identity [RFC3748] (1)
@@ -428,12 +429,12 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
               ruijie_ack_password(ruijie_recv[0x13], name, passwd, ruijie_recv + 0x18, ruijie_recv[0x17]);
               break;
               }
-            break;
+            continue;
           case EAP_SUCCESS:
             ruijie_ripe_success_info();
             if (authprogress(RUIJIE_AUTH_SUCCESS, ruijie_recv, userptr)) return -1;
             success = 0;
-            break;
+            return success;
             }
         }
       tryed += success;

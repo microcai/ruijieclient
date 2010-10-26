@@ -176,7 +176,7 @@ int pkt_open_link(const char * _nic_name)
 	if (pcap_handle)
 		pcap_close(pcap_handle);
 
-	if (!(pcap_handle = pcap_open_live(nic_name, 65536, 0, 2000, pcap_errbuf)))
+	if (!(pcap_handle = pcap_open_live(nic_name, 65536, 0, 20000000, pcap_errbuf)))
 	{
 		snprintf(pkt_errbuff, sizeof(pkt_errbuff), "Cannot open nic %s :%s",
 				nic_name, pcap_errbuf);
@@ -332,13 +332,13 @@ int pkt_build_ruijie(int lengh, const char* ruijiedata)
 int pkt_build_8021x_ext(u_char code, u_char id, uint16_t length,
 		const char* extra)
 {
-	memmove(pkt_buffer + length, pkt_buffer, pkt_length);
+	memmove(pkt_buffer + length+4, pkt_buffer, pkt_length);
 	pkt_buffer[0] = code;
 	pkt_buffer[1] = id;
-	pkt_buffer[2] = HIBYTE(length);
-	pkt_buffer[3] = LOBYTE(length);
+	pkt_buffer[2] = HIBYTE(length+4);
+	pkt_buffer[3] = LOBYTE(length+4);
 	memcpy(pkt_buffer + 4, extra, length);
-	pkt_length += length;
+	pkt_length += length+4;
 	return 0;
 }
 
