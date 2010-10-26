@@ -31,13 +31,17 @@
 #include "config.h"
 #endif
 
-
+#include <sys/cdefs.h>
+#include <sys/types.h>
 #include <sys/poll.h>
-#include "conn_monitor.h"
+#include <netinet/in.h>
+#include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #ifdef HAVE_LINUX_RTNETLINK_H
 #include <linux/rtnetlink.h>
 #endif
+
+#include "conn_monitor.h"
 
 static u_int16_t checksum(u_int16_t *buffer, int size)
 {
