@@ -197,7 +197,7 @@ main(int argc, char* argv[])
     "Copyright © %s %s\n\n"
     "Please see/send bug report to \n%s\n"
     "or mail to %s \n\n", PACKAGE,"2009-2009","Microcai, sthots, Gong Han, Chen Tingjun, and others",
-    "2009-2010","薇菜工作室 and sthost(G.S.Alex)",
+    "2009-2010","薇菜工作室 and sthots(G.S.Alex)",
     "http://code.google.com/p/ruijieclient/issues/list",
     PACKAGE_BUGREPORT);
   do
