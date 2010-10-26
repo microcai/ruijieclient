@@ -39,11 +39,11 @@
 #define RJ_PKT_START 01
 #define RJ_PKT_STOP  02
 
-#define EAP_FAILED		1
+
 #define EAP_REQUEST		1
 #define EAP_RESPONSE    2
 #define EAP_SUCCESS     3
-
+#define EAP_FAILED		4
 
 #define MAKEWORD(hibyte,lobyte) ((hibyte<<8 & 0xFF00)| (lobyte&0XFF))
 

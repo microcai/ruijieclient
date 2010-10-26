@@ -176,7 +176,7 @@ int pkt_open_link(const char * _nic_name)
 	if (pcap_handle)
 		pcap_close(pcap_handle);
 
-	if (!(pcap_handle = pcap_open_live(nic_name, 65536, 0, 20000000, pcap_errbuf)))
+	if (!(pcap_handle = pcap_open_live(nic_name, 65536, 0, 2000, pcap_errbuf)))
 	{
 		snprintf(pkt_errbuff, sizeof(pkt_errbuff), "Cannot open nic %s :%s",
 				nic_name, pcap_errbuf);

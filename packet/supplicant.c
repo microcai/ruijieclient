@@ -413,7 +413,7 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
         {
           switch ( ruijie_recv[0x12])
             {
-          case EAP_FAILED+3:
+          case EAP_FAILED:
         	authprogress(RUIJIE_AUTH_FAILED,ruijie_recv,userptr);
         	break;
           case EAP_REQUEST:
