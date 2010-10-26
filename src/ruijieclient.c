@@ -86,11 +86,10 @@ static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 	  fputs("@@ Detecting Server ...... \n", stdout);
 	  break;
 	case RUIJIE_AUTH_NEEDNAME:
-	  fprintf(stdout, "@@ Server Detected @ %s, authorize as %s ...\n", "gateaway",
-		      sender.m_name);
+	  fprintf(stdout, "@@ Server Detected @ authorize as %s ...\n",sender.m_name);
 	  break;
 	case RUIJIE_AUTH_NEEDPASSWD:
-	  fputs("@@ User name valid, encrpyt password...\n", stdout);
+	  fputs("@@ User name valid @@ encrpyt password...\n", stdout);
 	  break;
 	case RUIJIE_AUTH_SUCCESS:
 	  fputs("@@ User Authorize!\n", stdout);
@@ -99,6 +98,7 @@ static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 	  {
 		  code_convert(messageUTF8,sizeof(messageUTF8),messageGBK,gbklen);
 		  fputs(messageUTF8,stdout);
+		  fputs("\n",stdout);
 	  }
 	  break;
 	case RUIJIE_AUTH_FAILED:
