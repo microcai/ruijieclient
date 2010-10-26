@@ -306,8 +306,8 @@ static int ruijie_ack_password(int id,char*name,char*passwd,const u_char* MD5val
   EAP_EXTRA[1] = 16 ; //Value-Size: 16
   memcpy(EAP_EXTRA+2,md5Dig,16); // md5 encrypt passwd
   strcpy(EAP_EXTRA+18,name);//user name
-  pkt_build_8021x_ext(EAP_RESPONSE,id,22+strlen(name),EAP_EXTRA);
-  pkt_build_8021x(1,0,26+strlen(name),0,0);
+  pkt_build_8021x_ext(EAP_RESPONSE,id,18+strlen(name),EAP_EXTRA);
+  pkt_build_8021x(1,0,22+strlen(name),0,0);
   pkt_build_ethernet(ruijie_dest,0,ETH_PROTO_8021X);
   return pkt_write_link();
 }
@@ -420,6 +420,8 @@ int ruijie_start_auth(char * name, char*passwd, char* nic_name, int authmode,
             switch (ruijie_recv[0x16])
               {
             case 1: //Type: Identity [RFC3748] (1)
+            	//保存服务器地址
+              memcpy(ruijie_dest,ruijie_recv+6,6);
               if (authprogress(RUIJIE_AUTH_NEEDNAME, ruijie_recv, userptr)) return -1;
               ruijie_ack_name(ruijie_recv[0x13], name);
               break;

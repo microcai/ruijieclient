@@ -76,6 +76,10 @@ static ruijie_packet sender = { 0 };
 // return 1 will abort the auth engine
 static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 {
+  static char messageGBK[1500];
+  static char messageUTF8[1500];
+  int gbklen;
+
   switch(reason)
   {
 	case RUIJIE_AUTH_FINDSERVER:
@@ -90,6 +94,12 @@ static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 	  break;
 	case RUIJIE_AUTH_SUCCESS:
 	  fputs("@@ User Authorize!\n", stdout);
+	  //开始剥取数据
+	  if((gbklen = ruijie_get_server_msg(messageGBK,sizeof(messageGBK)))>1)
+	  {
+		  code_convert(messageUTF8,sizeof(messageUTF8),messageGBK,gbklen);
+		  fputs(messageUTF8,stdout);
+	  }
 	  break;
 	case RUIJIE_AUTH_FAILED:
 	  fputs("@@ Authorize Failed!\n", stdout);
