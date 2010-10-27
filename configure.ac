@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([ruijieclient], [0.8.3], [microcai@fedoraproject.org])
+AC_INIT([ruijieclient], [1.0-rc1], [microcai@fedoraproject.org])
 
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_CONFIG_SRCDIR([config.h.in])
