@@ -20,7 +20,7 @@ love:
 	@ echo '          *'
 	@ echo Make love complete
 
-rpm: dist @PACKAGE_NAME@.spec
+rpm: dist-bzip2 @PACKAGE_NAME@.spec
 	rpmbuild -bb \
 			--define "_sourcedir `pwd`" \
 			--define "_builddir `pwd`" \
@@ -29,7 +29,7 @@ rpm: dist @PACKAGE_NAME@.spec
 			--define "_srcrpmdir `pwd`" \
 			$(spec)
 
-srpm: dist @PACKAGE_NAME@.spec
+srpm: dist-bzip2 @PACKAGE_NAME@.spec
 	rpmbuild -bs \
 			--define "_sourcedir `pwd`" \
 			--define "_builddir `pwd`" \
