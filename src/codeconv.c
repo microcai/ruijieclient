@@ -5497,7 +5497,6 @@ static const uint16_t __gbk_to_ucs[] =
   [0x5dc6] = 0xfa14, [0x5dc7] = 0xfa18, [0x5dc8] = 0xfa1f, [0x5dc9] = 0xfa20,
   [0x5dca] = 0xfa21, [0x5dcb] = 0xfa23, [0x5dcc] = 0xfa24, [0x5dcd] = 0xfa27,
   [0x5dce] = 0xfa28, [0x5dcf] = 0xfa29,
-  [0x5e20] = 0x0000,
 };
 
 int
@@ -5516,7 +5515,10 @@ code_convert(char *outbuf, size_t bufoutlen, char *inbuf, size_t inlen)
 	  {
 		  nextval = 2;
 		  //GBK 先转化到 USC
-		  unsigned int ucs = __gbk_to_ucs[ (gbkin[gbki] - 0x81)*192 + (gbkin[gbki+1]  - 0x40)];
+		  unsigned int idx = (gbkin[gbki] - 0x81)*192 + (gbkin[gbki+1]  - 0x40);
+		  if(idx > 0x5dcf)
+			  continue;
+		  unsigned int ucs = __gbk_to_ucs[idx ];
 		  if(ucs <= 0x7FF)
 		  {
 			  utf8out[outlen] = ((ucs & 0x7C0) >> 6) | 0xc0 ;
