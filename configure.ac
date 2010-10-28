@@ -73,7 +73,7 @@ AC_CHECK_HEADER([net/if_dl.h],[
 				]])	
 	])						
 
-AC_CHECK_HEADERS([iconv.h  arpa/inet.h stdlib.h string.h sys/socket.h sys/time.h unistd.h net/ethernet.h])
+AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/socket.h sys/time.h unistd.h net/ethernet.h])
 
 AC_CHECK_HEADERS([linux/rtnetlink.h],[],[],
 	[[ #include <sys/types.h>
