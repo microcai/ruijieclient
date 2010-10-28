@@ -24,10 +24,20 @@ AC_ARG_ENABLE(dyload,
 			[lookup libpcap.so when program starts link to instead of libpcap.so])],
 			[with_dyload=$enableval],
 			[with_dyload=no])
+			
+AC_ARG_ENABLE(gbk,
+			[AC_HELP_STRING([--disable-gbk],
+			[only soppurt gb2312, disable support of gbk. use full on embeded system])],
+			[enable_gbk=$enableval],
+			[enable_gbk="yes"])
+
+AM_CONDITIONAL(ENABLE_LARGE_CHAR_SET,[test "x$enable_gbk" = "xyes"])	
+			
 
 AS_IF( [ test "x$with_dyload" = "xyes"  ],[
 	AC_DEFINE(USE_DYLIBPCAP,1,[Use dlopen to load libpcap])	
 ])
+
 
 AC_CHECK_HEADER([pcap/pcap.h],[],[AC_MSG_FAILURE([pcap.h not found!],1)])
 
