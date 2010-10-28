@@ -147,7 +147,7 @@ static int gen_ruijie_private_packet(int mode,char*version)
   int iCircle = 0x15;
   int i, ax = 0, bx = 0, dx = 0;
 
-  unsigned int c_ver1, c_ver2;
+  uint32_t c_ver1, c_ver2;
   struct sockaddr so_addr;
   u_char sCircleBase[0x15] =
     {
