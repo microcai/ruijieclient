@@ -20,10 +20,10 @@ AC_ARG_ENABLE(debug,
               )
 
 AC_ARG_ENABLE(dyload,
-			[AC_HELP_STRING([--diable-dyload],
-			[link to libpcap.so instead of lookup libpcap.so when program starts])],
+			[AC_HELP_STRING([--enable-dyload],
+			[lookup libpcap.so when program starts link to instead of libpcap.so])],
 			[with_dyload=$enableval],
-			[with_dyload=yes])
+			[with_dyload=no])
 
 AS_IF( [ test "x$with_dyload" = "xyes"  ],[
 	AC_DEFINE(USE_DYLIBPCAP,1,[Use dlopen to load libpcap])	
