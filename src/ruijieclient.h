@@ -77,7 +77,7 @@ typedef struct __ruijie_packet
    */
 
   int m_dhcpmode;
-  // auth mode: 0:standard 1:Star private
+  // auth mode: 1:standard 0:Star private
   int m_authenticationMode;
 
   // echo interval, 0 means disable echo

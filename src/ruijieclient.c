@@ -134,8 +134,6 @@ main(int argc, char* argv[])
   long showversion = 0;
   char pinghost[32] = "";
 
-  sender.m_authenticationMode = 1;
-
   //gonhan 大哥，不要动这个结构体的code style,eclipse 的自动格式化总是把这个搞的更难看
   struct parameter_tags param[] =
   {
