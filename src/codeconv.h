@@ -30,10 +30,6 @@
 #ifndef CODECONV_H
 #define CODECONV_H
 
-#ifdef HAVE_ICONV_H
-#include <iconv.h>
-#endif
-
 #include <string.h>
 #include <stdio.h>
 

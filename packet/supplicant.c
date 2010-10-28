@@ -342,6 +342,7 @@ static int ruijie_ripe_success_info()
 int ruijie_echo()
 {
 
+
   union
   {
 	volatile u_int32_t l;
