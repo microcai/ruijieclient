@@ -152,6 +152,8 @@ main(int argc, char* argv[])
     {"--try", (char*)&try_time ,"    --try=?\t Try number of times of reconnection,-1 = infinite",sizeof(try_time),5,INTEGER},
     {"-u",sender.m_name ,0,sizeof(sender.m_name),2,STRING},
     {"--user",sender.m_name," -u,--user\t specify user name",sizeof(sender.m_name),6,STRING},
+    {"-s",(char*)&sender.m_authenticationMode,0,sizeof(sender.m_authenticationMode),2,BOOL_both},
+    {"--std",(char*)&sender.m_authenticationMode," -s,--std\t use standard discovery MAC address",sizeof(sender.m_authenticationMode),5,BOOL_both},
     {"--version", (char*)&showversion ,"    --version\t show the version of RuijieClient",sizeof(showversion),9, BOOL_both},
     {"-M", (char*)&flag_nokill ,0,sizeof(flag_nokill),2, BOOL_both},
     {0}
