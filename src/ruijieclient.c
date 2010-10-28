@@ -134,6 +134,8 @@ main(int argc, char* argv[])
   long showversion = 0;
   char pinghost[32] = "";
 
+  sender.m_echoInterval = 20;
+
   //gonhan 大哥，不要动这个结构体的code style,eclipse 的自动格式化总是把这个搞的更难看
   struct parameter_tags param[] =
   {
@@ -152,6 +154,7 @@ main(int argc, char* argv[])
     {"--user",sender.m_name," -u,--user\t specify user name",sizeof(sender.m_name),6,STRING},
     {"-s",(char*)&sender.m_authenticationMode,0,sizeof(sender.m_authenticationMode),2,BOOL_both},
     {"--std",(char*)&sender.m_authenticationMode," -s,--std\t use standard discovery MAC address",sizeof(sender.m_authenticationMode),5,BOOL_both},
+    {"-i",(char*)&sender.m_echoInterval,"-i    \t echo interval, default 20s",sizeof(sender.m_echoInterval),2,INTEGER},
     {"--version", (char*)&showversion ,"    --version\t show the version of RuijieClient",sizeof(showversion),9, BOOL_both},
     {"-M", (char*)&flag_nokill ,0,sizeof(flag_nokill),2, BOOL_both},
     {0}

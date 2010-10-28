@@ -164,6 +164,9 @@ static int gen_ruijie_private_packet(int mode,char*version)
       ruijie_privatedata[0x3B] = c_ver1;
       ruijie_privatedata[0x3C] = c_ver2;
     }
+
+  ruijie_Echo_Key = htonl(0x1b8b4563);
+
   if( c_ver1 >=3 && c_ver2 >= 50)
     ruijie_Echo_Key = htonl(0x0000102b);
 
@@ -341,8 +344,8 @@ int ruijie_echo()
 
   union
   {
-    u_int32_t l;
-    u_char s[4];
+	volatile u_int32_t l;
+    volatile u_char s[4];
 
   } tmp;
 
@@ -351,7 +354,7 @@ int ruijie_echo()
       0x9F,0xF7,0xFF,0x00,0x00,0xFF,0xFF,0x37,0x77,0x7F,0x3F,0xFF,0x00,0x00,0x00
   };
 
-  tmp.l = ruijie_Echo_Diff;
+  tmp.l = ruijie_Echo_Key;
 
   EchoData[0x10] = Alog(tmp.s[0]);
   EchoData[0x11] = Alog(tmp.s[1]);
