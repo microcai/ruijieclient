@@ -103,6 +103,12 @@ static int ruijie_call_back(int reason,const char * current_packet,void*userptr)
 	  break;
 	case RUIJIE_AUTH_FAILED:
 	  fputs("@@ Authorize Failed!\n", stdout);
+	  if((gbklen = ruijie_get_server_msg(messageGBK,sizeof(messageGBK)))>1)
+	  {
+		  code_convert(messageUTF8,sizeof(messageUTF8),messageGBK,gbklen);
+		  fputs(messageUTF8,stdout);
+		  fputs("\n",stdout);
+	  }
 	  break;
   }
   return 0;
