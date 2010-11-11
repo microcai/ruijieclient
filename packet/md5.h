@@ -24,7 +24,14 @@ documentation and/or software.*/
 
 #ifndef MD5_H
 #define MD5_h
+
+#ifdef _WIN32
+#include <windows.h>
+typedef UINT32	uint32_t;
+typedef UINT32 u_int32_t;
+#else
 #include <sys/types.h>
+#endif
 /* POINTER defines a generic pointer type */
 typedef unsigned char *POINTER;
 

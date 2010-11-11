@@ -4,9 +4,12 @@
 AC_PREREQ([2.63])
 AC_INIT([ruijieclient], [1.0-rc1], [microcai@fedoraproject.org])
 
+AC_CANONICAL_SYSTEM
+
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
+
 
 # Checks for programs.
 AC_PROG_CC
